@@ -250,7 +250,7 @@ export default function ApplicationForm() {
   if (isLoading) {
     return (
       <div className="container mx-auto py-10">
-        <Card className="max-w-4xl mx-auto p-6">
+        <Card className="max-w-4xl mx-auto p-6 bg-black border-[#005CB9]">
           <div className="flex items-center justify-center h-32">
             <p className="text-muted-foreground">Loading application data...</p>
           </div>
@@ -261,18 +261,12 @@ export default function ApplicationForm() {
 
   return (
     <div className="container mx-auto py-10">
-      <Card className="max-w-4xl mx-auto p-6">
+      <Card className="max-w-4xl mx-auto p-6 bg-black border-[#005CB9]">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold">RocketHacks Application</h1>
-          {existingApplication ? (
-            <p className="text-muted-foreground">
-              Your application has been submitted and is {(existingApplication?.status ?? "under review").toLowerCase()}.
-            </p>
-          ) : (
-            <p className="text-muted-foreground">
-              Please fill out all required fields in the application form below.
-            </p>
-          )}
+          <h1 className="text-2xl font-bold text-[#FFDA00]">RocketHacks Application</h1>
+          <p className="text-muted-foreground">
+            Please fill out all required fields in the application form below.
+          </p>
         </div>
 
         {existingApplication ? (
@@ -280,7 +274,7 @@ export default function ApplicationForm() {
           <div className="space-y-8">
             {/* Basic Information Section */}
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold">Basic Information</h2>
+              <h2 className="text-xl font-semibold text-[#FFDA00]">Basic Information</h2>
               <div className="grid gap-4">
                 <div>
                   <h3 className="font-medium">Phone Number</h3>
@@ -298,7 +292,7 @@ export default function ApplicationForm() {
             </div>
             
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold">Education</h2>
+              <h2 className="text-xl font-semibold text-[#FFDA00]">Education</h2>
               <div className="grid gap-4">
                 <div>
                   <h3 className="font-medium">Student Status</h3>
@@ -324,7 +318,7 @@ export default function ApplicationForm() {
             </div>
             
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold">Experience</h2>
+              <h2 className="text-xl font-semibold text-[#FFDA00]">Experience</h2>
               <div className="grid gap-4">
                 <div>
                   <h3 className="font-medium">MLH Participation</h3>
@@ -357,7 +351,7 @@ export default function ApplicationForm() {
             </div>
             
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold">Team & Goals</h2>
+              <h2 className="text-xl font-semibold text-[#FFDA00]">Team & Goals</h2>
               <div className="grid gap-4">
                 <div>
                   <h3 className="font-medium">Has Team</h3>
@@ -385,7 +379,7 @@ export default function ApplicationForm() {
             </div>
             
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold">Support Needs</h2>
+              <h2 className="text-xl font-semibold text-[#FFDA00]">Support Needs</h2>
               <div className="grid gap-4">
                 <div>
                   <h3 className="font-medium">Needs Sponsorship</h3>
@@ -409,7 +403,7 @@ export default function ApplicationForm() {
             </div>
             
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold">Emergency Contact</h2>
+              <h2 className="text-xl font-semibold text-[#FFDA00]">Emergency Contact</h2>
               <div className="grid gap-4">
                 <div>
                   <h3 className="font-medium">Name</h3>
@@ -427,7 +421,7 @@ export default function ApplicationForm() {
             </div>
             
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold">Additional Information</h2>
+              <h2 className="text-xl font-semibold text-[#FFDA00]">Additional Information</h2>
               <div className="grid gap-4">
                 <div>
                   <h3 className="font-medium">T-Shirt Size</h3>
@@ -461,21 +455,30 @@ export default function ApplicationForm() {
         ) : (
           // Show the form
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8" noValidate>
+            <form 
+              onSubmit={form.handleSubmit(onSubmit)} 
+              className="space-y-8 bg-black/50 backdrop-blur-sm rounded-lg p-6 border border-[#005CB9]/30" 
+              noValidate
+            >
               {/* Basic Information Section */}
               <div className="space-y-6">
-                <h2 className="text-xl font-semibold">Basic Information</h2>
+                <h2 className="text-xl font-semibold text-[#FFDA00]">Basic Information</h2>
                 <div className="grid gap-4 md:grid-cols-2">
                   <FormField
                     control={form.control}
                     name="phone_number"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
+                        <FormLabel className="text-white">Phone Number</FormLabel>
                         <FormControl>
-                          <Input {...field} value={field.value || ''} />
+                          <Input 
+                            placeholder="Enter your phone number" 
+                            {...field} 
+                            value={field.value || ''} 
+                            className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]"
+                          />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-[#FFDA00]" />
                       </FormItem>
                     )}
                   />
@@ -487,9 +490,9 @@ export default function ApplicationForm() {
                       <FormItem>
                         <FormLabel>Address</FormLabel>
                         <FormControl>
-                          <Input {...field} value={field.value || ''} />
+                          <Input placeholder="Enter your address" {...field} value={field.value || ''} className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]" />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-[#FFDA00]" />
                       </FormItem>
                     )}
                   />
@@ -502,19 +505,23 @@ export default function ApplicationForm() {
                         <FormLabel>Citizenship</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value || ''}>
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="bg-zinc-900 border-[#005CB9] text-white">
                               <SelectValue placeholder="Select your citizenship" />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent>
+                          <SelectContent className="bg-black border-[#005CB9]">
                             {countries.map((country) => (
-                              <SelectItem key={country} value={country}>
+                              <SelectItem 
+                                key={country} 
+                                value={country}
+                                className="text-white hover:bg-[#005CB9] hover:text-[#FFDA00]"
+                              >
                                 {country}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
-                        <FormMessage />
+                        <FormMessage className="text-[#FFDA00]" />
                       </FormItem>
                     )}
                   />
@@ -523,8 +530,8 @@ export default function ApplicationForm() {
 
               {/* Education Section */}
               <div className="space-y-6">
-                <h2 className="text-xl font-semibold">Education</h2>
-                <div className="grid gap-4 md:grid-cols-2">
+                <h2 className="text-xl font-semibold text-[#FFDA00]">Education</h2>
+                <div className="grid gap-4">
                   <FormField
                     control={form.control}
                     name="is_student"
@@ -534,95 +541,111 @@ export default function ApplicationForm() {
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            className="border-[#005CB9] data-[state=checked]:bg-[#005CB9] data-[state=checked]:text-[#FFDA00]"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
-                          <FormLabel>
-                            Are you currently a student?
-                          </FormLabel>
+                          <FormLabel>Are you currently a student?</FormLabel>
                         </div>
                       </FormItem>
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="school"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>School</FormLabel>
-                        <FormControl>
-                          <Input {...field} value={field.value || ''} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {form.watch("is_student") && (
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <FormField
+                        control={form.control}
+                        name="school"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>School</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter your school name" {...field} value={field.value || ''} className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]" />
+                            </FormControl>
+                            <FormMessage className="text-[#FFDA00]" />
+                          </FormItem>
+                        )}
+                      />
 
-                  <FormField
-                    control={form.control}
-                    name="study_level"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Study Level</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value || ''}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select your study level" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {STUDY_LEVELS.map((level) => (
-                              <SelectItem key={level} value={level}>
-                                {level}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      <FormField
+                        control={form.control}
+                        name="study_level"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Study Level</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value || ''}>
+                              <FormControl>
+                                <SelectTrigger className="bg-zinc-900 border-[#005CB9] text-white">
+                                  <SelectValue placeholder="Select your study level" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent className="bg-black border-[#005CB9]">
+                                {STUDY_LEVELS.map((level) => (
+                                  <SelectItem 
+                                    key={level} 
+                                    value={level}
+                                    className="text-white hover:bg-[#005CB9] hover:text-[#FFDA00]"
+                                  >
+                                    {level}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage className="text-[#FFDA00]" />
+                          </FormItem>
+                        )}
+                      />
 
-                  <FormField
-                    control={form.control}
-                    name="graduation_year"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Graduation Year</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="number" 
-                            min={new Date().getFullYear()} 
-                            max={new Date().getFullYear() + 6}
-                            {...field}
-                            value={field.value || ''}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      <FormField
+                        control={form.control}
+                        name="graduation_year"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Expected Graduation Year</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value?.toString() || ''}>
+                              <FormControl>
+                                <SelectTrigger className="bg-zinc-900 border-[#005CB9] text-white">
+                                  <SelectValue placeholder="Select graduation year" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent className="bg-black border-[#005CB9]">
+                                {graduationYears.map((year) => (
+                                  <SelectItem 
+                                    key={year} 
+                                    value={year.toString()}
+                                    className="text-white hover:bg-[#005CB9] hover:text-[#FFDA00]"
+                                  >
+                                    {year}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage className="text-[#FFDA00]" />
+                          </FormItem>
+                        )}
+                      />
 
-                  <FormField
-                    control={form.control}
-                    name="major"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Major</FormLabel>
-                        <FormControl>
-                          <Input {...field} value={field.value || ''} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      <FormField
+                        control={form.control}
+                        name="major"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Major/Field of Study</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter your major" {...field} value={field.value || ''} className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]" />
+                            </FormControl>
+                            <FormMessage className="text-[#FFDA00]" />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Experience Section */}
               <div className="space-y-6">
-                <h2 className="text-xl font-semibold">Experience</h2>
+                <h2 className="text-xl font-semibold text-[#FFDA00]">Experience</h2>
                 <div className="grid gap-4">
                   <FormField
                     control={form.control}
@@ -633,6 +656,7 @@ export default function ApplicationForm() {
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            className="border-[#005CB9] data-[state=checked]:bg-[#005CB9] data-[state=checked]:text-[#FFDA00]"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
@@ -673,6 +697,7 @@ export default function ApplicationForm() {
                                               )
                                             )
                                       }}
+                                      className="border-[#005CB9] data-[state=checked]:bg-[#005CB9] data-[state=checked]:text-[#FFDA00]"
                                     />
                                   </FormControl>
                                   <FormLabel className="text-sm font-normal">
@@ -683,7 +708,7 @@ export default function ApplicationForm() {
                             />
                           ))}
                         </div>
-                        <FormMessage />
+                        <FormMessage className="text-[#FFDA00]" />
                       </FormItem>
                     )}
                   />
@@ -706,9 +731,10 @@ export default function ApplicationForm() {
                                 .filter(Boolean)
                               field.onChange(languages)
                             }}
+                            className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]"
                           />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-[#FFDA00]" />
                       </FormItem>
                     )}
                   />
@@ -722,6 +748,7 @@ export default function ApplicationForm() {
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            className="border-[#005CB9] data-[state=checked]:bg-[#005CB9] data-[state=checked]:text-[#FFDA00]"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
@@ -745,9 +772,10 @@ export default function ApplicationForm() {
                               {...field}
                               value={field.value || ''}
                               placeholder="Describe your previous hackathon experiences..."
+                              className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]"
                             />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="text-[#FFDA00]" />
                         </FormItem>
                       )}
                     />
@@ -757,7 +785,7 @@ export default function ApplicationForm() {
 
               {/* Team & Goals Section */}
               <div className="space-y-6">
-                <h2 className="text-xl font-semibold">Team & Goals</h2>
+                <h2 className="text-xl font-semibold text-[#FFDA00]">Team & Goals</h2>
                 <div className="grid gap-4">
                   <FormField
                     control={form.control}
@@ -768,6 +796,7 @@ export default function ApplicationForm() {
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            className="border-[#005CB9] data-[state=checked]:bg-[#005CB9] data-[state=checked]:text-[#FFDA00]"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
@@ -787,6 +816,7 @@ export default function ApplicationForm() {
                             <Checkbox
                               checked={field.value}
                               onCheckedChange={field.onChange}
+                              className="border-[#005CB9] data-[state=checked]:bg-[#005CB9] data-[state=checked]:text-[#FFDA00]"
                             />
                           </FormControl>
                           <div className="space-y-1 leading-none">
@@ -809,9 +839,10 @@ export default function ApplicationForm() {
                               {...field}
                               value={field.value || ''}
                               placeholder="Describe the skills you're looking for..."
+                              className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]"
                             />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="text-[#FFDA00]" />
                         </FormItem>
                       )}
                     />
@@ -828,9 +859,10 @@ export default function ApplicationForm() {
                             {...field}
                             value={field.value || ''}
                             placeholder="Share your goals and what you hope to achieve..."
+                            className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]"
                           />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-[#FFDA00]" />
                       </FormItem>
                     )}
                   />
@@ -842,9 +874,9 @@ export default function ApplicationForm() {
                       <FormItem>
                         <FormLabel>How did you hear about us?</FormLabel>
                         <FormControl>
-                          <Input {...field} value={field.value || ''} />
+                          <Input {...field} value={field.value || ''} className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]" />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-[#FFDA00]" />
                       </FormItem>
                     )}
                   />
@@ -853,7 +885,7 @@ export default function ApplicationForm() {
 
               {/* Support Needs Section */}
               <div className="space-y-6">
-                <h2 className="text-xl font-semibold">Support Needs</h2>
+                <h2 className="text-xl font-semibold text-[#FFDA00]">Support Needs</h2>
                 <div className="grid gap-4">
                   <FormField
                     control={form.control}
@@ -864,6 +896,7 @@ export default function ApplicationForm() {
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            className="border-[#005CB9] data-[state=checked]:bg-[#005CB9] data-[state=checked]:text-[#FFDA00]"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
@@ -882,6 +915,7 @@ export default function ApplicationForm() {
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            className="border-[#005CB9] data-[state=checked]:bg-[#005CB9] data-[state=checked]:text-[#FFDA00]"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
@@ -903,9 +937,10 @@ export default function ApplicationForm() {
                               {...field}
                               value={field.value || ''}
                               placeholder="Describe any accommodations you need..."
+                              className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]"
                             />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="text-[#FFDA00]" />
                         </FormItem>
                       )}
                     />
@@ -920,6 +955,7 @@ export default function ApplicationForm() {
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            className="border-[#005CB9] data-[state=checked]:bg-[#005CB9] data-[state=checked]:text-[#FFDA00]"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
@@ -941,9 +977,10 @@ export default function ApplicationForm() {
                               {...field}
                               value={field.value || ''}
                               placeholder="Describe your dietary restrictions..."
+                              className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]"
                             />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="text-[#FFDA00]" />
                         </FormItem>
                       )}
                     />
@@ -953,7 +990,7 @@ export default function ApplicationForm() {
 
               {/* Emergency Contact Section */}
               <div className="space-y-6">
-                <h2 className="text-xl font-semibold">Emergency Contact</h2>
+                <h2 className="text-xl font-semibold text-[#FFDA00]">Emergency Contact</h2>
                 <div className="grid gap-4 md:grid-cols-2">
                   <FormField
                     control={form.control}
@@ -962,9 +999,9 @@ export default function ApplicationForm() {
                       <FormItem>
                         <FormLabel>Emergency Contact Name</FormLabel>
                         <FormControl>
-                          <Input {...field} value={field.value || ''} />
+                          <Input {...field} value={field.value || ''} className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]" />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-[#FFDA00]" />
                       </FormItem>
                     )}
                   />
@@ -976,9 +1013,9 @@ export default function ApplicationForm() {
                       <FormItem>
                         <FormLabel>Emergency Contact Phone</FormLabel>
                         <FormControl>
-                          <Input {...field} value={field.value || ''} />
+                          <Input {...field} value={field.value || ''} className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]" />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-[#FFDA00]" />
                       </FormItem>
                     )}
                   />
@@ -990,9 +1027,9 @@ export default function ApplicationForm() {
                       <FormItem>
                         <FormLabel>Relationship to Emergency Contact</FormLabel>
                         <FormControl>
-                          <Input {...field} value={field.value || ''} />
+                          <Input {...field} value={field.value || ''} className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]" />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-[#FFDA00]" />
                       </FormItem>
                     )}
                   />
@@ -1001,7 +1038,7 @@ export default function ApplicationForm() {
 
               {/* Additional Information Section */}
               <div className="space-y-6">
-                <h2 className="text-xl font-semibold">Additional Information</h2>
+                <h2 className="text-xl font-semibold text-[#FFDA00]">Additional Information</h2>
                 <div className="grid gap-4">
                   <FormField
                     control={form.control}
@@ -1011,19 +1048,23 @@ export default function ApplicationForm() {
                         <FormLabel>T-Shirt Size</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value || ''}>
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="bg-zinc-900 border-[#005CB9] text-white">
                               <SelectValue placeholder="Select your t-shirt size" />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent>
+                          <SelectContent className="bg-black border-[#005CB9]">
                             {TSHIRT_SIZES.map((size) => (
-                              <SelectItem key={size} value={size}>
+                              <SelectItem 
+                                key={size} 
+                                value={size}
+                                className="text-white hover:bg-[#005CB9] hover:text-[#FFDA00]"
+                              >
                                 {size}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
-                        <FormMessage />
+                        <FormMessage className="text-[#FFDA00]" />
                       </FormItem>
                     )}
                   />
@@ -1037,6 +1078,7 @@ export default function ApplicationForm() {
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            className="border-[#005CB9] data-[state=checked]:bg-[#005CB9] data-[state=checked]:text-[#FFDA00]"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
@@ -1050,7 +1092,7 @@ export default function ApplicationForm() {
 
               {/* Agreements Section */}
               <div className="space-y-6">
-                <h2 className="text-xl font-semibold">Agreements</h2>
+                <h2 className="text-xl font-semibold text-[#FFDA00]">Agreements</h2>
                 <div className="grid gap-4">
                   <FormField
                     control={form.control}
@@ -1062,6 +1104,7 @@ export default function ApplicationForm() {
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             required
+                            className="border-[#005CB9] data-[state=checked]:bg-[#005CB9] data-[state=checked]:text-[#FFDA00]"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
@@ -1081,6 +1124,7 @@ export default function ApplicationForm() {
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             required
+                            className="border-[#005CB9] data-[state=checked]:bg-[#005CB9] data-[state=checked]:text-[#FFDA00]"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
@@ -1099,6 +1143,7 @@ export default function ApplicationForm() {
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            className="border-[#005CB9] data-[state=checked]:bg-[#005CB9] data-[state=checked]:text-[#FFDA00]"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
@@ -1118,6 +1163,7 @@ export default function ApplicationForm() {
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             required
+                            className="border-[#005CB9] data-[state=checked]:bg-[#005CB9] data-[state=checked]:text-[#FFDA00]"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
@@ -1137,6 +1183,7 @@ export default function ApplicationForm() {
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             required
+                            className="border-[#005CB9] data-[state=checked]:bg-[#005CB9] data-[state=checked]:text-[#FFDA00]"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
@@ -1153,12 +1200,14 @@ export default function ApplicationForm() {
                   type="button"
                   variant="outline"
                   onClick={() => router.push('/dashboard')}
+                  className="border-[#005CB9] text-white hover:bg-[#005CB9] hover:text-[#FFDA00]"
                 >
                   Cancel
                 </Button>
                 <Button 
                   type="submit"
                   disabled={isSubmitting}
+                  className="bg-[#005CB9] text-[#FFDA00] hover:bg-[#FFDA00] hover:text-[#005CB9]"
                 >
                   {isSubmitting ? "Submitting..." : "Submit Application"}
                 </Button>
