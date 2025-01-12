@@ -1,0 +1,38 @@
+1. Full Name: Text input
+2. Email Address: Text input (email format)
+3. Phone Number: Text input (phone format)
+4. Date of Birth: Date picker
+5. Gender (Optional): Dropdown or radio buttons
+6. Current Address: Text input
+7. Country of Citizenship: Dropdown menu
+8. Are you a student?: Yes/No radio buttons
+9. School Name: Text input or dropdown
+10. Level of Study: Dropdown
+11. Expected Graduation Year: Dropdown
+12. Major/Field of Study: Text input
+13. Have you attended an MLH event before?: Yes/No radio buttons
+14. Technical Skills: Checkbox (multiple selections)
+15. Programming Languages You Know: Checkbox or text input
+16. Do you have any hackathon experience?: Yes/No radio buttons
+17. If Yes, please describe your hackathon experience: Text input
+18. Do you already have a team for this event?: Yes/No radio buttons
+19. Would you like help finding teammates?: Yes/No radio buttons
+20. If yes, what skills or roles are you looking for in teammates?: Text input
+21. What do you hope to achieve at this event?: Text input
+22. How did you hear about this event?: Dropdown or checkbox
+23. Are you interested in applying for sponsorship (e.g., travel reimbursement)?: Yes/No radio buttons
+24. Do you have any accessibility needs?: Yes/No radio buttons
+25. If yes, please specify: Text input
+26. Do you have any dietary restrictions?: Yes/No radio buttons
+27. If yes, please specify: Text input
+28. Do you agree to abide by the MLH Code of Conduct?: Yes/No checkbox
+29. Do you consent to sharing your data with MLH for event administration?: Yes/No checkbox
+30. Do you consent to receiving updates and notifications from MLH?: Yes/No checkbox
+31. Emergency Contact Name: Text input
+32. Emergency Contact Phone Number: Text input
+33. Relationship to Emergency Contact: Text input
+34. What is your T-shirt size?: Dropdown
+35. Race/Ethnicity (Optional): Checkbox or dropdown (multiple selections)
+36. Do you identify as part of an underrepresented group in tech?: Yes/No radio buttons
+37. I certify that the information provided is accurate: Checkbox
+38. I understand that this registration does not guarantee admission to the event: Checkbox
