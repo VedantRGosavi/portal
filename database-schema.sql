@@ -16,60 +16,68 @@ create table
     constraint profile_id_fkey foreign key (id) references auth.users (id)
   ) tablespace pg_default;
 
--- Create applications table
-create table applications (
-    id uuid default uuid_generate_v4() primary key,
-    user_id uuid references profile(id) on delete cascade not null,
-    -- Basic Info
-    phone_number text,
-    address text,
-    citizenship text,
-    is_student boolean,
-    study_level text,
-    graduation_year int,
-    major text,
-    -- Experience
-    attended_mlh boolean,
-    technical_skills text[],
-    programming_languages text[],
-    hackathon_experience boolean,
-    hackathon_experience_desc text,
-    -- Team & Goals
-    has_team boolean,
-    needs_teammates boolean,
-    desired_teammate_skills text,
-    goals text,
-    heard_from text,
-    -- Support Needs
-    needs_sponsorship boolean,
-    accessibility_needs boolean,
-    accessibility_desc text,
-    dietary_restrictions boolean,
-    dietary_desc text,
-    -- Emergency Contact
-    emergency_contact_name text,
-    emergency_contact_phone text,
-    emergency_contact_relation text,
-    -- Demographics
-    tshirt_size text,
-    ethnicity text[],
-    underrepresented boolean,
-    -- Status & Resume
-    status text default 'Under Review' check (status in ('Under Review', 'Accepted', 'Rejected')),
-    resume_url text,
-    -- Agreements
-    mlh_code_of_conduct boolean,
-    mlh_data_sharing boolean,
-    mlh_communications boolean,
-    info_accurate boolean,
-    understands_admission boolean,
-    -- Timestamps
-    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-    updated_at timestamp with time zone default timezone('utc'::text, now()) not null
-);
+create table
+  public.applications (
+    id uuid not null default extensions.uuid_generate_v4 (),
+    user_id uuid not null,
+    phone_number text null,
+    address text null,
+    citizenship text null,
+    is_student boolean null,
+    study_level text null,
+    graduation_year integer null,
+    major text null,
+    attended_mlh boolean null,
+    technical_skills text[] null,
+    programming_languages text[] null,
+    hackathon_experience boolean null,
+    hackathon_experience_desc text null,
+    has_team boolean null,
+    needs_teammates boolean null,
+    desired_teammate_skills text null,
+    goals text null,
+    heard_from text null,
+    needs_sponsorship boolean null,
+    accessibility_needs boolean null,
+    accessibility_desc text null,
+    dietary_restrictions boolean null,
+    dietary_desc text null,
+    emergency_contact_name text null,
+    emergency_contact_phone text null,
+    emergency_contact_relation text null,
+    tshirt_size text null,
+    ethnicity text[] null,
+    underrepresented boolean null,
+    status text null default 'Under Review'::text,
+    resume_url text null,
+    mlh_code_of_conduct boolean null,
+    mlh_data_sharing boolean null,
+    mlh_communications boolean null,
+    info_accurate boolean null,
+    understands_admission boolean null,
+    created_at timestamp with time zone not null default timezone ('utc'::text, now()),
+    updated_at timestamp with time zone not null default timezone ('utc'::text, now()),
+    school text null,
+    constraint applications_pkey primary key (id),
+    constraint applications_user_id_fkey foreign key (user_id) references profile (id) on update cascade on delete cascade,
+    constraint applications_status_check check (
+      (
+        status = any (
+          array[
+            'Under Review'::text,
+            'Accepted'::text,
+            'Rejected'::text
+          ]
+        )
+      )
+    )
+  ) tablespace pg_default;
+
+create trigger handle_applications_updated_at before
+update on applications for each row
+execute function handle_updated_at ();
 
 -- Create RLS policies
-
 
 -- Applications policies
 alter table applications enable row level security;

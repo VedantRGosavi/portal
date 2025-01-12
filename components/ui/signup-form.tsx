@@ -204,7 +204,7 @@ export function SignupForm({
             </div>
           </form>
           
-          <div className="relative hidden bg-[#15397F] md:block">
+          <div className="relative hidden bg-black md:block">
             <img
               src={logoSrc}
               alt="Logo"

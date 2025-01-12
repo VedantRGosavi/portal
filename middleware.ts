@@ -115,5 +115,6 @@ export async function middleware(request: NextRequest) {
       '/dashboard/:path*',
       '/auth/:path*',
       '/profile',
+      '/application',
     ]
   }

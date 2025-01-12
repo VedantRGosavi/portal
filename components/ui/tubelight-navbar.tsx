@@ -13,6 +13,7 @@ interface NavItem {
   url: string
   icon: React.ElementType
   requiresAuth?: boolean
+  hideWhenAuth?: boolean
 }
 
 const navItems: NavItem[] = [
@@ -21,6 +22,13 @@ const navItems: NavItem[] = [
     url: "/",
     icon: Home,
     requiresAuth: false,
+  },
+  {
+    name: "Apply",
+    url: "/auth/signup",
+    icon: FileText,
+    requiresAuth: false,
+    hideWhenAuth: true,
   },
   {
     name: "Dashboard",
@@ -86,7 +94,8 @@ export function TubelightNavbar() {
   }
 
   const filteredItems = navItems.filter(item => 
-    !item.requiresAuth || (item.requiresAuth && isAuthenticated)
+    (!item.requiresAuth || (item.requiresAuth && isAuthenticated)) && 
+    (!item.hideWhenAuth || !isAuthenticated)
   )
 
   return (
