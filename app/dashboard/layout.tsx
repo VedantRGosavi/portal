@@ -1,4 +1,4 @@
-import { Navbar } from "@/components/ui/navbar"
+import { TubelightNavbar } from "@/components/ui/tubelight-navbar"
 
 export default function DashboardLayout({
   children,
@@ -7,7 +7,7 @@ export default function DashboardLayout({
 }) {
   return (
     <>
-      <Navbar />
+      <TubelightNavbar />
       {children}
     </>
   )
