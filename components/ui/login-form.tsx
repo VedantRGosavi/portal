@@ -34,9 +34,9 @@ export function LoginForm({
   ...props
 }: LoginFormProps) {
   return (
-    <Card className="w-full max-w-[900px] overflow-hidden">
+    <Card className="w-full max-w-[900px] overflow-hidden bg-black/50 backdrop-blur-sm border-[#005CB9]/30">
       <CardContent className="p-0 grid md:grid-cols-2">
-        <form onSubmit={onSubmit} className="p-8 bg-black text-white">
+        <form onSubmit={onSubmit} className="p-8 text-white">
           <div className="flex flex-col gap-6">
             <div className="flex flex-col items-center text-center">
               <h1 className="text-2xl font-bold text-white">Welcome back</h1>
@@ -132,7 +132,7 @@ export function LoginForm({
           </div>
         </form>
         
-        <div className="relative hidden md:block bg-black">
+        <div className="relative hidden md:block">
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="relative w-3/4">
               <img

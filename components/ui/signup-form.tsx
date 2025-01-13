@@ -65,9 +65,9 @@ export function SignupForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="overflow-hidden bg-black">
+      <Card className="overflow-hidden bg-black/50 backdrop-blur-sm border-[#005CB9]/30">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form onSubmit={handleFormSubmit} className="p-6 md:p-8 bg-black text-white">
+          <form onSubmit={handleFormSubmit} className="p-6 md:p-8 text-white">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold text-white">Create an account</h1>
@@ -171,7 +171,7 @@ export function SignupForm({
             </div>
           </form>
           
-          <div className="relative hidden bg-black md:block">
+          <div className="relative hidden md:block">
             <img
               src={logoSrc}
               alt="Logo"

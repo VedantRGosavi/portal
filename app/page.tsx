@@ -21,6 +21,7 @@ export default function Home(): ReactElement {
           squareSize={4}
           gridGap={6}
           flickerChance={0.2}
+          goldFlickerChance={0.015}
         />
       </div>
 
