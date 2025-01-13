@@ -587,19 +587,19 @@ export default function ApplicationForm() {
                         <FormLabel>Programming Languages</FormLabel>
                         <FormControl>
                           <Input 
-                            placeholder="e.g., Python, JavaScript, Java (comma-separated)"
+                            placeholder="Enter programming languages"
                             {...field}
-                            value={field.value.join(', ')}
+                            value={field.value[0] || ''}
                             onChange={(e) => {
-                              const languages = e.target.value
-                                .split(',')
-                                .map((lang) => lang.trim())
-                                .filter(Boolean)
-                              field.onChange(languages)
+                              // Store the entire input as a single string in the array
+                              field.onChange([e.target.value])
                             }}
                             className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]"
                           />
                         </FormControl>
+                        <FormDescription className="text-gray-400">
+                          Enter your programming languages. You can include spaces in language names.
+                        </FormDescription>
                         <FormMessage className="text-[#FFDA00]" />
                       </FormItem>
                     )}
