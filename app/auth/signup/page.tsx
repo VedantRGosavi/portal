@@ -48,7 +48,7 @@ export default function SignUpPage() {
           data: {
             full_name: fullName,
           },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `https://portal.rockethacks.org/auth/callback`,
         },
       });
 
@@ -110,7 +110,7 @@ export default function SignUpPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `https://portal.rockethacks.org/auth/callback`,
         },
       });
 

@@ -174,41 +174,6 @@ export default function ApplicationForm() {
     checkExistingApplication()
   }, [form])
 
-  const onSave = async () => {
-    try {
-      setIsSubmitting(true);
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      
-      if (userError || !user) throw new Error("User not found");
-
-      const formValues = form.getValues();
-      const cleanedValues = cleanFormData(formValues);
-
-      // Preserve existing status or set to "Draft" for new applications
-      const status = existingApplication?.status || "Draft";
-
-      const { error: saveError } = await supabase
-        .from("applications")
-        .upsert([{
-          user_id: user.id,
-          ...cleanedValues,
-          status, // Use preserved status
-          updated_at: new Date().toISOString(),
-        }]);
-
-      if (saveError) throw saveError;
-
-      toast({
-        title: "Progress Saved",
-        description: "Your application has been saved. You can continue later.",
-        duration: 3000,
-      });
-    } catch (error) {
-      handleError(error, toast, "Failed to save progress. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const onSubmit = async (values: ApplicationFormValues) => {
     // Only block submission if there's an existing submitted application
@@ -280,84 +245,95 @@ export default function ApplicationForm() {
       <Card className="bg-background border-[#005CB9]">
         <div className="mb-8 p-6">
           <h1 className="text-2xl font-bold text-[#FFDA00]">RocketHacks Application</h1>
-          <p className="text-muted-foreground">
-            Please fill out all required fields in the application form below.
-          </p>
+          {existingApplication ? (
+            <div className="mt-4 space-y-2">
+              <p className="text-white">
+                Thank you for submitting your application to RocketHacks!
+              </p>
+              <p className="text-muted-foreground">
+                We will review your application and notify you of our decision via email. 
+                You can also check your application status here on the dashboard.
+              </p>
+            </div>
+          ) : (
+            <p className="text-muted-foreground">
+              Please fill out all required fields in the application form below.
+            </p>
+          )}
         </div>
-
         {existingApplication ? (
           // Show read-only view of the application
-          <div className="space-y-8">
-            {/* Basic Information Section */}
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-[#FFDA00]">Basic Information</h2>
-              <div className="grid gap-4">
-                <div>
-                  <h3 className="font-medium">Phone Number</h3>
+          <div className="p-6 space-y-8">
+            {/* Each section is wrapped in a styled card */}
+            <div className="bg-black/30 rounded-lg p-6 border border-[#005CB9]/20">
+              <h2 className="text-xl font-semibold text-[#FFDA00] mb-6">Basic Information</h2>
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <h3 className="font-medium text-white">Phone Number</h3>
                   <p className="text-muted-foreground">{existingApplication.phone_number || 'Not provided'}</p>
                 </div>
-                <div>
-                  <h3 className="font-medium">Address</h3>
+                <div className="space-y-2">
+                  <h3 className="font-medium text-white">Address</h3>
                   <p className="text-muted-foreground">{existingApplication.address || 'Not provided'}</p>
                 </div>
-                <div>
-                  <h3 className="font-medium">Citizenship</h3>
+                <div className="space-y-2">
+                  <h3 className="font-medium text-white">Citizenship</h3>
                   <p className="text-muted-foreground">{existingApplication.citizenship || 'Not provided'}</p>
                 </div>
               </div>
             </div>
-            
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-[#FFDA00]">Education</h2>
-              <div className="grid gap-4">
-                <div>
-                  <h3 className="font-medium">Student Status</h3>
+
+            <div className="bg-black/30 rounded-lg p-6 border border-[#005CB9]/20">
+              <h2 className="text-xl font-semibold text-[#FFDA00] mb-6">Education</h2>
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <h3 className="font-medium text-white">Student Status</h3>
                   <p className="text-muted-foreground">{existingApplication.is_student ? 'Current Student' : 'Not a Student'}</p>
                 </div>
-                <div>
-                  <h3 className="font-medium">School</h3>
+                <div className="space-y-2">
+                  <h3 className="font-medium text-white">School</h3>
                   <p className="text-muted-foreground">{existingApplication.school || 'Not provided'}</p>
                 </div>
-                <div>
-                  <h3 className="font-medium">Study Level</h3>
+                <div className="space-y-2">
+                  <h3 className="font-medium text-white">Study Level</h3>
                   <p className="text-muted-foreground">{existingApplication.study_level || 'Not provided'}</p>
                 </div>
-                <div>
-                  <h3 className="font-medium">Graduation Year</h3>
+                <div className="space-y-2">
+                  <h3 className="font-medium text-white">Graduation Year</h3>
                   <p className="text-muted-foreground">{existingApplication.graduation_year || 'Not provided'}</p>
                 </div>
-                <div>
-                  <h3 className="font-medium">Major</h3>
+                <div className="space-y-2">
+                  <h3 className="font-medium text-white">Major</h3>
                   <p className="text-muted-foreground">{existingApplication.major || 'Not provided'}</p>
                 </div>
               </div>
             </div>
-            
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-[#FFDA00]">Experience</h2>
-              <div className="grid gap-4">
-                <div>
-                  <h3 className="font-medium">MLH Participation</h3>
+
+            <div className="bg-black/30 rounded-lg p-6 border border-[#005CB9]/20">
+              <h2 className="text-xl font-semibold text-[#FFDA00] mb-6">Experience</h2>
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <h3 className="font-medium text-white">MLH Participation</h3>
                   <p className="text-muted-foreground">{existingApplication.attended_mlh ? 'Yes' : 'No'}</p>
                 </div>
-                <div>
-                  <h3 className="font-medium">Technical Skills</h3>
+                <div className="space-y-2 sm:col-span-2">
+                  <h3 className="font-medium text-white">Technical Skills</h3>
                   <p className="text-muted-foreground">
                     {existingApplication.technical_skills.length > 0 
                       ? existingApplication.technical_skills.join(', ') 
                       : 'None provided'}
                   </p>
                 </div>
-                <div>
-                  <h3 className="font-medium">Programming Languages</h3>
+                <div className="space-y-2 sm:col-span-2">
+                  <h3 className="font-medium text-white">Programming Languages</h3>
                   <p className="text-muted-foreground">
                     {existingApplication.programming_languages.length > 0 
                       ? existingApplication.programming_languages.join(', ') 
                       : 'None provided'}
                   </p>
                 </div>
-                <div>
-                  <h3 className="font-medium">Hackathon Experience</h3>
+                <div className="space-y-2 sm:col-span-2">
+                  <h3 className="font-medium text-white">Hackathon Experience</h3>
                   <p className="text-muted-foreground">{existingApplication.hackathon_experience ? 'Yes' : 'No'}</p>
                   {existingApplication.hackathon_experience_desc && (
                     <p className="text-muted-foreground mt-2">{existingApplication.hackathon_experience_desc}</p>
@@ -365,51 +341,51 @@ export default function ApplicationForm() {
                 </div>
               </div>
             </div>
-            
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-[#FFDA00]">Team & Goals</h2>
-              <div className="grid gap-4">
-                <div>
-                  <h3 className="font-medium">Has Team</h3>
+
+            <div className="bg-black/30 rounded-lg p-6 border border-[#005CB9]/20">
+              <h2 className="text-xl font-semibold text-[#FFDA00] mb-6">Team & Goals</h2>
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <h3 className="font-medium text-white">Has Team</h3>
                   <p className="text-muted-foreground">{existingApplication.has_team ? 'Yes' : 'No'}</p>
                 </div>
-                <div>
-                  <h3 className="font-medium">Looking for Teammates</h3>
+                <div className="space-y-2">
+                  <h3 className="font-medium text-white">Looking for Teammates</h3>
                   <p className="text-muted-foreground">{existingApplication.needs_teammates ? 'Yes' : 'No'}</p>
                 </div>
                 {existingApplication.desired_teammate_skills && (
-                  <div>
-                    <h3 className="font-medium">Desired Teammate Skills</h3>
+                  <div className="space-y-2 sm:col-span-2">
+                    <h3 className="font-medium text-white">Desired Teammate Skills</h3>
                     <p className="text-muted-foreground">{existingApplication.desired_teammate_skills}</p>
                   </div>
                 )}
-                <div>
-                  <h3 className="font-medium">Goals</h3>
+                <div className="space-y-2 sm:col-span-2">
+                  <h3 className="font-medium text-white">Goals</h3>
                   <p className="text-muted-foreground">{existingApplication.goals || 'Not provided'}</p>
                 </div>
-                <div>
-                  <h3 className="font-medium">How did you hear about us?</h3>
+                <div className="space-y-2 sm:col-span-2">
+                  <h3 className="font-medium text-white">How did you hear about us?</h3>
                   <p className="text-muted-foreground">{existingApplication.heard_from || 'Not provided'}</p>
                 </div>
               </div>
             </div>
-            
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-[#FFDA00]">Support Needs</h2>
-              <div className="grid gap-4">
-                <div>
-                  <h3 className="font-medium">Needs Sponsorship</h3>
+
+            <div className="bg-black/30 rounded-lg p-6 border border-[#005CB9]/20">
+              <h2 className="text-xl font-semibold text-[#FFDA00] mb-6">Support Needs</h2>
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <h3 className="font-medium text-white">Needs Sponsorship</h3>
                   <p className="text-muted-foreground">{existingApplication.needs_sponsorship ? 'Yes' : 'No'}</p>
                 </div>
-                <div>
-                  <h3 className="font-medium">Accessibility Needs</h3>
+                <div className="space-y-2">
+                  <h3 className="font-medium text-white">Accessibility Needs</h3>
                   <p className="text-muted-foreground">{existingApplication.accessibility_needs ? 'Yes' : 'No'}</p>
                   {existingApplication.accessibility_desc && (
                     <p className="text-muted-foreground mt-2">{existingApplication.accessibility_desc}</p>
                   )}
                 </div>
-                <div>
-                  <h3 className="font-medium">Dietary Restrictions</h3>
+                <div className="space-y-2">
+                  <h3 className="font-medium text-white">Dietary Restrictions</h3>
                   <p className="text-muted-foreground">{existingApplication.dietary_restrictions ? 'Yes' : 'No'}</p>
                   {existingApplication.dietary_desc && (
                     <p className="text-muted-foreground mt-2">{existingApplication.dietary_desc}</p>
@@ -417,52 +393,52 @@ export default function ApplicationForm() {
                 </div>
               </div>
             </div>
-            
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-[#FFDA00]">Emergency Contact</h2>
-              <div className="grid gap-4">
-                <div>
-                  <h3 className="font-medium">Name</h3>
+
+            <div className="bg-black/30 rounded-lg p-6 border border-[#005CB9]/20">
+              <h2 className="text-xl font-semibold text-[#FFDA00] mb-6">Emergency Contact</h2>
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <h3 className="font-medium text-white">Name</h3>
                   <p className="text-muted-foreground">{existingApplication.emergency_contact_name || 'Not provided'}</p>
                 </div>
-                <div>
-                  <h3 className="font-medium">Phone</h3>
+                <div className="space-y-2">
+                  <h3 className="font-medium text-white">Phone</h3>
                   <p className="text-muted-foreground">{existingApplication.emergency_contact_phone || 'Not provided'}</p>
                 </div>
-                <div>
-                  <h3 className="font-medium">Relationship</h3>
+                <div className="space-y-2">
+                  <h3 className="font-medium text-white">Relationship</h3>
                   <p className="text-muted-foreground">{existingApplication.emergency_contact_relation || 'Not provided'}</p>
                 </div>
               </div>
             </div>
-            
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-[#FFDA00]">Additional Information</h2>
-              <div className="grid gap-4">
-                <div>
-                  <h3 className="font-medium">T-Shirt Size</h3>
+
+            <div className="bg-black/30 rounded-lg p-6 border border-[#005CB9]/20">
+              <h2 className="text-xl font-semibold text-[#FFDA00] mb-6">Additional Information</h2>
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <h3 className="font-medium text-white">T-Shirt Size</h3>
                   <p className="text-muted-foreground">{existingApplication.tshirt_size || 'Not provided'}</p>
                 </div>
-                <div>
-                  <h3 className="font-medium">Ethnicity</h3>
+                <div className="space-y-2">
+                  <h3 className="font-medium text-white">Ethnicity</h3>
                   <p className="text-muted-foreground">
                     {existingApplication.ethnicity.length > 0 
                       ? existingApplication.ethnicity.join(', ') 
                       : 'Not provided'}
                   </p>
                 </div>
-                <div>
-                  <h3 className="font-medium">Underrepresented Group</h3>
+                <div className="space-y-2">
+                  <h3 className="font-medium text-white">Underrepresented Group</h3>
                   <p className="text-muted-foreground">{existingApplication.underrepresented ? 'Yes' : 'No'}</p>
                 </div>
               </div>
             </div>
-            
-            <div className="flex justify-end">
+            <div className="flex justify-end pt-6">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => router.push('/dashboard')}
+                className="bg-[#005CB9]/10 hover:bg-[#005CB9]/20 text-white border-[#005CB9]"
               >
                 Back to Dashboard
               </Button>
@@ -1219,15 +1195,6 @@ export default function ApplicationForm() {
                   className="border-[#005CB9] text-white hover:bg-[#005CB9] hover:text-[#FFDA00]"
                 >
                   Cancel
-                </Button>
-                <Button 
-                  type="button"
-                  onClick={onSave}
-                  disabled={isSubmitting}
-                  variant="outline"
-                  className="border-[#005CB9] text-white hover:bg-[#005CB9] hover:text-[#FFDA00]"
-                >
-                  Save Progress
                 </Button>
                 <Button 
                   type="submit"

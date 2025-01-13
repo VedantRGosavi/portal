@@ -30,8 +30,24 @@ export async function GET(request: Request) {
 
     try {
       const { data: { session }, error } = await supabase.auth.exchangeCodeForSession(code)
-      if (!session?.user) throw new Error('No user found')
       if (error) throw error
+      if (!session?.user) throw new Error('No user found')
+
+      // Check if this is a login attempt (user already exists)
+      const { data: existingProfile } = await supabase
+        .from('profile')
+        .select('id')
+        .eq('id', session.user.id)
+        .single()
+
+      // If no existing profile and this is a login attempt (not signup)
+      if (!existingProfile && requestUrl.pathname === '/auth/callback') {
+        // Delete the newly created auth user since this was a login attempt
+        await supabase.auth.admin.deleteUser(session.user.id)
+        return NextResponse.redirect(
+          new URL('/auth/login?error=no_account', requestUrl.origin)
+        )
+      }
 
       // If this is a new GitHub user, create their profile
       if (session.user.app_metadata.provider === 'github') {
