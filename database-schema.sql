@@ -16,6 +16,40 @@ create table
     constraint profile_id_fkey foreign key (id) references auth.users (id)
   ) tablespace pg_default;
 
+-- Enable RLS on profile table
+alter table profile enable row level security;
+
+-- Create profile policies
+create policy "Users can create their own profile"
+  on profile for insert
+  with check (auth.uid() = id);
+
+create policy "Users can view own profile"
+  on profile for select
+  using (auth.uid() = id);
+
+create policy "Users can update own profile"
+  on profile for update
+  using (auth.uid() = id);
+
+create policy "Admins can view all profiles"
+  on profile for select
+  using (
+    exists (
+      select 1 from profile
+      where id = auth.uid() and role = 'admin'
+    )
+  );
+
+create policy "Admins can update all profiles"
+  on profile for update
+  using (
+    exists (
+      select 1 from profile
+      where id = auth.uid() and role = 'admin'
+    )
+  );
+
 create table
   public.applications (
     id uuid not null default extensions.uuid_generate_v4 (),
@@ -58,12 +92,17 @@ create table
     created_at timestamp with time zone not null default timezone ('utc'::text, now()),
     updated_at timestamp with time zone not null default timezone ('utc'::text, now()),
     school text null,
+    linkedin_url text null,
+    github_url text null,
+    portfolio_url text null,
     constraint applications_pkey primary key (id),
+    constraint unique_user_application unique (user_id),
     constraint applications_user_id_fkey foreign key (user_id) references profile (id) on update cascade on delete cascade,
     constraint applications_status_check check (
       (
         status = any (
           array[
+            'Draft'::text,
             'Under Review'::text,
             'Accepted'::text,
             'Rejected'::text
@@ -72,6 +111,8 @@ create table
       )
     )
   ) tablespace pg_default;
+
+create index if not exists idx_applications_user_id on public.applications using btree (user_id) tablespace pg_default;
 
 create trigger handle_applications_updated_at before
 update on applications for each row
