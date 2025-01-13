@@ -1,5 +1,5 @@
 "use client";
-
+// app/auth/signup/page.tsx
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
@@ -103,11 +103,31 @@ export default function SignUpPage() {
     }
   };
 
+  const handleGitHubSignUp = async () => {
+    try {
+      setLoading(true);
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) throw error;
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "An error occurred with GitHub signup");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <div className="w-full max-w-sm md:max-w-3xl">
         <SignupForm 
           onSubmit={handleSubmit}
+          onGitHubSignUp={handleGitHubSignUp}
           email={email}
           setEmail={setEmail}
           password={password}

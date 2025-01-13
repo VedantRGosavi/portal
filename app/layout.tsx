@@ -1,3 +1,5 @@
+// app/layout.tsx
+
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "next-themes"
@@ -24,8 +26,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <TubelightNavbar />
-          {children}
+          <div className="min-h-screen flex flex-col">
+            <TubelightNavbar />
+            <main className="flex-1 pt-24">
+              <div className="py-4 md:py-6 px-4 md:px-6 space-y-6">
+                {children}
+              </div>
+            </main>
+          </div>
         </ThemeProvider>
       </body>
     </html>

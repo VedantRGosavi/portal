@@ -1,5 +1,6 @@
 "use client"
 // app/dashboard/application/page.tsx
+
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { ApplicationFormValues, applicationFormSchema } from "./schema"
@@ -7,6 +8,9 @@ import { createClient } from "@/utils/supabase/client"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
+import { FORM_CONSTANTS } from "@/app/lib/constants/form-constants";
+import { cleanFormData, handleError } from "@/app/lib/utils/form-utils";
+
 
 import {
   Form,
@@ -170,82 +174,94 @@ export default function ApplicationForm() {
     checkExistingApplication()
   }, [form])
 
-  const onSubmit = async (values: ApplicationFormValues) => {
-    if (existingApplication) {
+  const onSave = async () => {
+    try {
+      setIsSubmitting(true);
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) throw new Error("User not found");
+
+      const formValues = form.getValues();
+      const cleanedValues = cleanFormData(formValues);
+
+      // Preserve existing status or set to "Draft" for new applications
+      const status = existingApplication?.status || "Draft";
+
+      const { error: saveError } = await supabase
+        .from("applications")
+        .upsert([{
+          user_id: user.id,
+          ...cleanedValues,
+          status, // Use preserved status
+          updated_at: new Date().toISOString(),
+        }]);
+
+      if (saveError) throw saveError;
+
       toast({
-        title: "Application Already Exists",
-        description: "You have already submitted an application.",
+        title: "Progress Saved",
+        description: "Your application has been saved. You can continue later.",
+        duration: 3000,
+      });
+    } catch (error) {
+      handleError(error, toast, "Failed to save progress. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const onSubmit = async (values: ApplicationFormValues) => {
+    // Only block submission if there's an existing submitted application
+    if (existingApplication && existingApplication.status !== "Draft") {
+      toast({
+        title: "Application Already Submitted",
+        description: "You have already submitted a non-draft application.",
         variant: "destructive",
       })
       return
     }
 
     try {
-      setIsSubmitting(true)
+      setIsSubmitting(true);
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
       
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser()
-      
-      if (userError || !user) throw new Error("User not found")
+      if (userError || !user) throw new Error("User not found");
 
-      const cleanedValues = Object.entries(values).reduce((acc, [key, value]) => {
-        if (typeof value === 'string') {
-          acc[key] = value.trim() === '' ? null : value.trim()
-        } 
-        else if (Array.isArray(value)) {
-          acc[key] = value.length === 0 ? [] : value
-        }
-        else {
-          acc[key] = value
-        }
-        return acc
-      }, {} as Record<string, any>)
-
-      if (cleanedValues.graduation_year) {
-        cleanedValues.graduation_year = parseInt(cleanedValues.graduation_year as string)
-      }
+      const cleanedValues = cleanFormData(values);
 
       const { error: submitError } = await supabase
         .from("applications")
-        .upsert([
-          {
-            user_id: user.id,
-            ...cleanedValues,
-            status: "Under Review",
-            updated_at: new Date().toISOString(),
-          } as ApplicationFormValues,
-        ])
+        .upsert([{
+          user_id: user.id,
+          ...cleanedValues,
+          status: "Under Review",
+          updated_at: new Date().toISOString(),
+        }]);
 
-      if (submitError) throw submitError
+      if (submitError) throw submitError;
 
       toast({
         title: "Application Submitted Successfully!",
         description: "You can track its status in your dashboard.",
         variant: "default",
         duration: 3000,
-      })
+      });
 
-      router.replace("/dashboard")
+      router.replace("/dashboard");
     } catch (error: any) {
       if (error?.code === '23505') {
         toast({
-          title: "Duplicate Application",
-          description: "You have already submitted an application.",
-          variant: "destructive",
-        })
-      } else {
-        toast({
           title: "Error",
-          description: "Failed to submit application. Please try again.",
+          description: "There was an issue submitting your application. Please try again.",
           variant: "destructive",
-        })
+        });
+      } else {
+        handleError(error, toast, "Failed to submit application. Please try again.");
       }
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -260,9 +276,9 @@ export default function ApplicationForm() {
   }
 
   return (
-    <div className="container mx-auto py-10">
-      <Card className="max-w-4xl mx-auto p-6 bg-black border-[#005CB9]">
-        <div className="mb-8">
+      <div className="container mx-auto p-4 sm:p-6 md:p-8">
+      <Card className="bg-background border-[#005CB9]">
+        <div className="mb-8 p-6">
           <h1 className="text-2xl font-bold text-[#FFDA00]">RocketHacks Application</h1>
           <p className="text-muted-foreground">
             Please fill out all required fields in the application form below.
@@ -1203,6 +1219,15 @@ export default function ApplicationForm() {
                   className="border-[#005CB9] text-white hover:bg-[#005CB9] hover:text-[#FFDA00]"
                 >
                   Cancel
+                </Button>
+                <Button 
+                  type="button"
+                  onClick={onSave}
+                  disabled={isSubmitting}
+                  variant="outline"
+                  className="border-[#005CB9] text-white hover:bg-[#005CB9] hover:text-[#FFDA00]"
+                >
+                  Save Progress
                 </Button>
                 <Button 
                   type="submit"

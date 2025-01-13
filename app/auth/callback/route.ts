@@ -1,4 +1,5 @@
 // /app/auth/callback/route.ts
+
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -28,9 +29,55 @@ export async function GET(request: Request) {
     )
 
     try {
-      await supabase.auth.exchangeCodeForSession(code)
-      return NextResponse.redirect(new URL('/profile', requestUrl.origin))
+      const { data: { session }, error } = await supabase.auth.exchangeCodeForSession(code)
+      if (!session?.user) throw new Error('No user found')
+      if (error) throw error
+
+      // If this is a new GitHub user, create their profile
+      if (session.user.app_metadata.provider === 'github') {
+        const { data: existingProfile } = await supabase
+          .from('profile')
+          .select('id')
+          .eq('id', session.user.id)
+          .single()
+
+        if (!existingProfile) {
+          // Get display name from various possible GitHub metadata fields
+          const metadata = session.user.user_metadata
+          const displayName = metadata.full_name || 
+                            metadata.user_name || 
+                            metadata.username || 
+                            metadata.name || 
+                            session.user.email?.split('@')[0] || 
+                            'GitHub User'
+
+          await supabase
+            .from('profile')
+            .insert({
+              id: session.user.id,
+              email: session.user.email,
+              display_name: displayName,
+              role: 'applicant',
+              is_profile_complete: false,
+              created_at: new Date().toISOString()
+            })
+        }
+      }
+
+      // Check if profile is complete
+      const { data: profile } = await supabase
+        .from('profile')
+        .select('is_profile_complete')
+        .eq('id', session.user.id)
+        .single()
+
+      if (!profile?.is_profile_complete) {
+        return NextResponse.redirect(new URL('/profile', requestUrl.origin))
+      }
+
+      return NextResponse.redirect(new URL('/dashboard', requestUrl.origin))
     } catch (error) {
+      console.error('Auth error:', error)
       return NextResponse.redirect(new URL('/auth/login', requestUrl.origin))
     }
   }

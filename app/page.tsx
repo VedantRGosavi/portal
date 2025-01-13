@@ -1,4 +1,6 @@
-"use client";
+// app/page.tsx
+
+'use client'
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -28,10 +30,10 @@ export default function Home(): ReactElement {
           <img
             src="/images/logo.svg"
             alt="RocketHacks"
-            className="h-24 w-auto mx-auto"
+            className="h-64 w-auto mx-auto"
           />
-          <h1 className="text-6xl font-bold tracking-tight bg-gradient-to-r from-[#15397F] to-[#FFDA00] bg-clip-text text-transparent">
-            RocketHacks Applicaton Portal
+          <h1 className="text-6xl font-bold tracking-tight text-white">
+            RocketHacks Application Portal
           </h1>
           <p className="text-2xl text-[#FFDA00]">
             March 15-16, 2025

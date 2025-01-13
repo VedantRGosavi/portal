@@ -1,0 +1,38 @@
+export const FORM_CONSTANTS = {
+  TSHIRT_SIZES: ["XS", "S", "M", "L", "XL", "XXL", "XXXL"],
+  STUDY_LEVELS: ["High School", "Undergraduate", "Graduate", "Doctorate", "Other"],
+  TECHNICAL_SKILLS: [
+    "Web Development",
+    "Mobile Development",
+    "AI/ML",
+    "Data Science",
+    "Cybersecurity",
+    "UI/UX Design",
+    "Game Development",
+    "Cloud Computing",
+    "DevOps",
+    "Blockchain",
+  ],
+  PROGRAMMING_LANGUAGES: [
+    "JavaScript",
+    "Python",
+    "Java",
+    "C++",
+    "C#",
+    "Ruby",
+    "Swift",
+    "Go",
+    "Rust",
+    "TypeScript",
+  ],
+  ETHNICITIES: [
+    "Asian",
+    "Black or African American",
+    "Hispanic or Latino",
+    "Native American",
+    "Pacific Islander",
+    "White",
+    "Other",
+    "Prefer not to say",
+  ]
+} as const; 

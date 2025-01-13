@@ -1,5 +1,5 @@
 "use client";
-
+// app/auth/login/page.tsx
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
@@ -35,10 +35,29 @@ export default function LoginPage() {
     }
   };
 
+  const handleGitHubLogin = async () => {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) throw error;
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "An error occurred with GitHub login");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="w-full max-w-sm md:max-w-3xl">
       <LoginForm 
         onSubmit={handleSubmit}
+        onGitHubLogin={handleGitHubLogin}
         email={email}
         setEmail={setEmail}
         password={password}
@@ -46,7 +65,6 @@ export default function LoginPage() {
         loading={loading}
         error={error}
         logoSrc="/images/logo.svg"
-        
       />
     </div>
   );

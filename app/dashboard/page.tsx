@@ -1,37 +1,50 @@
 "use client"
-
+// app/dashboard/page.tsx
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
+import { createClient } from '@/utils/supabase/client'
+import { useEffect, useState } from 'react'
+import { ApplicationStatusCard } from "@/components/ui/application-status-card"
 
 export default function Dashboard() {
   const router = useRouter()
+  const supabase = createClient()
+  const [displayName, setDisplayName] = useState('Hacker')
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          const { data } = await supabase
+            .from('profile')
+            .select('display_name')
+            .eq('id', user.id)
+            .single()
+          
+          if (data?.display_name) {
+            setDisplayName(data.display_name)
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error)
+      }
+    }
+
+    fetchProfile()
+  }, [])
 
   return (
-    <div className="space-y-6 p-4 sm:p-6 md:p-8">
+    <div className="container mx-auto space-y-6 p-4 sm:p-6 md:p-8">
       <div>
-        <h2 className="text-2xl font-bold text-[#FFDA00]">Welcome back, Hacker!</h2>
+        <h2 className="text-2xl font-bold text-[#FFDA00]">Welcome back, {displayName}!</h2>
         <p className="text-muted-foreground mt-2">Track your application progress and updates here.</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="bg-background border-[#005CB9]">
-          <CardContent className="p-4 sm:p-6">
-            <h3 className="text-lg font-medium text-foreground mb-2">Application Status</h3>
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm text-muted-foreground">In Progress</span>
-              <span className="px-2 py-1 text-xs bg-[#FFDA00] text-background rounded-full">75% Complete</span>
-            </div>
-            <Progress value={75} className="mb-2 bg-[#005CB9]" />
-            <Button 
-              className="w-full mt-4 bg-[#005CB9] text-foreground hover:bg-[#005CB9]/90"
-              onClick={() => router.push('/dashboard/application')}
-            >
-              Continue Application
-            </Button>
-          </CardContent>
-        </Card>
+        <ApplicationStatusCard />
 
         <Card className="bg-background border-[#005CB9]">
           <CardContent className="p-4 sm:p-6">
@@ -39,15 +52,15 @@ export default function Dashboard() {
             <ul className="space-y-2">
               <li className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Application Deadline</span>
-                <span className="text-sm font-medium text-[#FFDA00]">July 15, 2024</span>
+                <span className="text-sm font-medium text-[#FFDA00]">February 15, 2025</span>
               </li>
               <li className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Team Formation</span>
-                <span className="text-sm font-medium text-[#FFDA00]">July 20, 2024</span>
+                <span className="text-sm font-medium text-[#FFDA00]">March 1, 2025</span>
               </li>
               <li className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Hackathon Starts</span>
-                <span className="text-sm font-medium text-[#FFDA00]">August 1, 2024</span>
+                <span className="text-sm font-medium text-[#FFDA00]">March 15, 2025</span>
               </li>
             </ul>
           </CardContent>

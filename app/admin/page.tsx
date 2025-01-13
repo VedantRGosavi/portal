@@ -1,6 +1,6 @@
 'use client'
-
-import { useState } from 'react'
+// app/admin/page.tsx
+import { useState, useEffect } from 'react'
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import {
@@ -21,84 +21,381 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Users, Clock, CheckCircle, XCircle, Download, ListFilter } from 'lucide-react'
+import { createClient } from '@/utils/supabase/client'
+import { useToast } from "@/hooks/use-toast"
+import { CSVLink } from 'react-csv'
+import { BulkActionsDropdown } from "@/components/ui/bulk-actions-dropdown"
+import { StatsCard } from "@/components/ui/stats-card"
+import { TablePagination } from "@/components/ui/table-pagination"
+import { useRouter } from 'next/navigation'
 
-// Mock data for demonstration
-const mockApplications = [
-  {
-    id: 1,
-    name: "Jane Cooper",
-    email: "jane.cooper@example.com",
-    status: "Under Review",
-    submitted: "2024-02-15",
-  },
-  // Add more mock data as needed
-]
+interface Application {
+  id: string
+  user_id: string
+  name: string
+  email: string
+  status: 'Under Review' | 'Accepted' | 'Rejected'
+  submitted: string
+  school?: string
+  study_level?: string
+}
+
+interface Stats {
+  total: number
+  pending: number
+  accepted: number
+  rejected: number
+}
+
+const ITEMS_PER_PAGE = 10
 
 export default function AdminDashboard() {
+  const [applications, setApplications] = useState<Application[]>([])
+  const [filteredApplications, setFilteredApplications] = useState<Application[]>([])
+  const [stats, setStats] = useState<Stats>({ total: 0, pending: 0, accepted: 0, rejected: 0 })
   const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [selectedApplications, setSelectedApplications] = useState<string[]>([])
+  const [loading, setLoading] = useState(true)
+  const [isAuthorized, setIsAuthorized] = useState(false)
+  
+  const supabase = createClient()
+  const { toast } = useToast()
+  const router = useRouter()
 
-  const stats = [
+  // Add verifyAdminStatus function
+  const verifyAdminStatus = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return false
+
+      const { data: profile } = await supabase
+        .from('profile')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      return profile?.role === 'admin'
+    } catch (error) {
+      console.error('Error verifying admin status:', error)
+      return false
+    }
+  }
+
+  // Fetch applications and calculate stats
+  const fetchApplications = async () => {
+    try {
+      const isAdmin = await verifyAdminStatus()
+      if (!isAdmin) {
+        toast({
+          title: "Unauthorized",
+          description: "You do not have permission to access this page",
+          variant: "destructive",
+        })
+        router.push('/dashboard')
+        return
+      }
+
+      const { data, error } = await supabase
+        .from('applications')
+        .select(`
+          *,
+          profile:user_id (
+            display_name,
+            email,
+            school
+          )
+        `)
+        .neq('status', 'Draft')
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+
+      if (!data) {
+        setApplications([])
+        setStats({ total: 0, pending: 0, accepted: 0, rejected: 0 })
+        return
+      }
+
+      const formattedApplications: Application[] = data.map(app => ({
+        id: app.id,
+        user_id: app.user_id,
+        name: app.profile?.display_name || 'Unknown',
+        email: app.profile?.email || 'No email',
+        status: app.status || 'Under Review',
+        submitted: new Date(app.created_at).toLocaleDateString(),
+        school: app.profile?.school || '',
+        study_level: app.study_level || ''
+      }))
+
+      setApplications(formattedApplications)
+      
+      const stats = {
+        total: formattedApplications.length,
+        pending: formattedApplications.filter(app => app.status === 'Under Review').length,
+        accepted: formattedApplications.filter(app => app.status === 'Accepted').length,
+        rejected: formattedApplications.filter(app => app.status === 'Rejected').length
+      }
+
+      setStats(stats)
+    } catch (error) {
+      console.error('Error fetching applications:', error)
+      toast({
+        title: "Error",
+        description: "Failed to load applications. Please try refreshing the page.",
+        variant: "destructive",
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Filter applications based on search and status
+  useEffect(() => {
+    let filtered = [...applications]
+    
+    // Apply search filter
+    if (search) {
+      const searchLower = search.toLowerCase()
+      filtered = filtered.filter(app => 
+        app.name.toLowerCase().includes(searchLower) ||
+        app.email.toLowerCase().includes(searchLower) ||
+        app.school?.toLowerCase().includes(searchLower)
+      )
+    }
+    
+    // Apply status filter
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(app => app.status.toLowerCase() === statusFilter)
+    }
+    
+    setFilteredApplications(filtered)
+    setCurrentPage(1) // Reset to first page when filters change
+  }, [search, statusFilter, applications])
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredApplications.length / ITEMS_PER_PAGE)
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+  const paginatedApplications = filteredApplications.slice(startIndex, startIndex + ITEMS_PER_PAGE)
+
+  // Modify updateStatus function
+  const updateStatus = async (applicationId: string, newStatus: string) => {
+    try {
+      const isAdmin = await verifyAdminStatus()
+      if (!isAdmin) {
+        toast({
+          title: "Unauthorized",
+          description: "You do not have permission to perform this action",
+          variant: "destructive",
+        })
+        router.push('/dashboard')
+        return
+      }
+
+      const { error } = await supabase
+        .from('applications')
+        .update({ status: newStatus })
+        .eq('id', applicationId)
+
+      if (error) throw error
+
+      // Update local state
+      setApplications(apps => 
+        apps.map(app => 
+          app.id === applicationId ? { ...app, status: newStatus as Application['status'] } : app
+        )
+      )
+
+      toast({
+        title: "Status Updated",
+        description: `Application status changed to ${newStatus}`,
+      })
+    } catch (error) {
+      console.error('Error updating status:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update status",
+        variant: "destructive",
+      })
+    }
+  }
+
+  // Modify handleBulkAction function
+  const handleBulkAction = async (action: 'accept' | 'reject') => {
+    try {
+      const isAdmin = await verifyAdminStatus()
+      if (!isAdmin) {
+        toast({
+          title: "Unauthorized",
+          description: "You do not have permission to perform this action",
+          variant: "destructive",
+        })
+        router.push('/dashboard')
+        return
+      }
+
+      const newStatus = action === 'accept' ? 'Accepted' : 'Rejected'
+      
+      const { error } = await supabase
+        .from('applications')
+        .update({ status: newStatus })
+        .in('id', selectedApplications)
+
+      if (error) throw error
+
+      // Update local state
+      setApplications(apps =>
+        apps.map(app =>
+          selectedApplications.includes(app.id) 
+            ? { ...app, status: newStatus as Application['status'] } 
+            : app
+        )
+      )
+
+      setSelectedApplications([])
+      toast({
+        title: "Bulk Update Complete",
+        description: `Updated ${selectedApplications.length} applications`,
+      })
+    } catch (error) {
+      console.error('Error in bulk update:', error)
+      toast({
+        title: "Error",
+        description: "Failed to perform bulk update",
+        variant: "destructive",
+      })
+    }
+  }
+
+  // Prepare export data
+  const exportData = applications.map(app => ({
+    Name: app.name,
+    Email: app.email,
+    School: app.school || 'N/A',
+    'Study Level': app.study_level || 'N/A',
+    Status: app.status,
+    'Submission Date': app.submitted
+  }))
+
+  const csvString = [
+    // Headers
+    ['Name', 'Email', 'School', 'Study Level', 'Status', 'Submission Date'],
+    // Data rows
+    ...exportData.map(row => [row.Name, row.Email, row.School, row['Study Level'], row.Status, row['Submission Date']])
+  ].map(row => row.join(',')).join('\n')
+
+  const blob = new Blob(['\ufeff', csvString], { type: 'text/csv;charset=utf-8;' })
+
+  const statsConfig = [
     {
       title: "Total Applications",
-      value: "256",
+      value: stats.total,
       icon: Users,
-      color: "text-[#15397F]",
-      bgColor: "bg-[#15397F]/10",
+      color: "text-blue-500",
+      bgColor: "bg-blue-500/10"
     },
     {
-      title: "Pending Review",
-      value: "64",
+      title: "Under Review",
+      value: stats.pending,
       icon: Clock,
-      color: "text-[#FFDA00]",
-      bgColor: "bg-[#FFDA00]/10",
+      color: "text-yellow-500",
+      bgColor: "bg-yellow-500/10"
     },
     {
       title: "Accepted",
-      value: "128",
+      value: stats.accepted,
       icon: CheckCircle,
       color: "text-green-500",
-      bgColor: "bg-green-500/10",
+      bgColor: "bg-green-500/10"
     },
     {
       title: "Rejected",
-      value: "64",
+      value: stats.rejected,
       icon: XCircle,
       color: "text-red-500",
-      bgColor: "bg-red-500/10",
-    },
+      bgColor: "bg-red-500/10"
+    }
   ]
+
+  // Modify the useEffect to check authorization first
+  useEffect(() => {
+    const checkAuthAndFetchData = async () => {
+      setLoading(true)
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+          router.push('/login')
+          return
+        }
+
+        const { data: profile } = await supabase
+          .from('profile')
+          .select('role')
+          .eq('id', user.id)
+          .single()
+
+        if (profile?.role !== 'admin') {
+          router.push('/dashboard')
+          return
+        }
+
+        setIsAuthorized(true)
+        fetchApplications()
+      } catch (error) {
+        console.error('Error checking authorization:', error)
+        toast({
+          title: "Error",
+          description: "You are not authorized to view this page",
+          variant: "destructive",
+        })
+        router.push('/dashboard')
+      }
+    }
+
+    checkAuthAndFetchData()
+  }, [router, supabase, toast])
+
+  if (!isAuthorized || loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h1 className="text-xl md:text-2xl font-bold text-[#15397F]">Application Review Dashboard</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-[#15397F]">
+          Application Review Dashboard
+        </h1>
         <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-          <Button variant="outline" className="w-full sm:w-auto border-[#15397F] text-[#FFDA00] hover:bg-[#15397F] hover:text-[#FFDA00]">
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              const link = document.createElement('a')
+              link.href = URL.createObjectURL(blob)
+              link.download = `applications-${new Date().toISOString().split('T')[0]}.csv`
+              link.click()
+              URL.revokeObjectURL(link.href)
+            }}
+            className="w-full sm:w-auto border-[#15397F] text-[#FFDA00] hover:bg-[#15397F] hover:text-[#FFDA00]"
+          >
             <Download className="w-4 h-4 mr-2" />
             Export Data
           </Button>
-          <Button className="w-full sm:w-auto bg-[#15397F] text-white hover:bg-[#15397F]/90">
-            <ListFilter className="w-4 h-4 mr-2" />
-            Bulk Actions
-          </Button>
+          <BulkActionsDropdown
+            selectedCount={selectedApplications.length}
+            onAccept={() => handleBulkAction('accept')}
+            onReject={() => handleBulkAction('reject')}
+          />
         </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <Card key={stat.title} className="bg-background border-[#15397F]">
-            <CardContent className="p-4 md:p-6">
-              <div className="flex items-center gap-4">
-                <div className={`p-2 rounded-full ${stat.bgColor}`}>
-                  <stat.icon className={`w-6 h-6 ${stat.color}`} />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">{stat.title}</p>
-                  <p className={`text-xl md:text-2xl font-bold ${stat.color}`}>{stat.value}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {statsConfig.map((stat) => (
+          <StatsCard key={stat.title} {...stat} />
         ))}
       </div>
 
@@ -128,6 +425,20 @@ export default function AdminDashboard() {
         <Table>
           <TableHeader>
             <TableRow className="border-b border-[#15397F] hover:bg-[#15397F]/5">
+              <TableHead className="text-[#FFDA00]">
+                <input
+                  type="checkbox"
+                  checked={selectedApplications.length > 0 && selectedApplications.length === paginatedApplications.length}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedApplications(paginatedApplications.map(app => app.id))
+                    } else {
+                      setSelectedApplications([])
+                    }
+                  }}
+                  className="rounded border-[#15397F]"
+                />
+              </TableHead>
               <TableHead className="text-[#FFDA00]">APPLICANT</TableHead>
               <TableHead className="text-[#FFDA00] hidden md:table-cell">EMAIL</TableHead>
               <TableHead className="text-[#FFDA00]">STATUS</TableHead>
@@ -136,8 +447,22 @@ export default function AdminDashboard() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {mockApplications.map((application) => (
+            {paginatedApplications.map((application) => (
               <TableRow key={application.id} className="border-b border-[#15397F] hover:bg-[#15397F]/5">
+                <TableCell>
+                  <input
+                    type="checkbox"
+                    checked={selectedApplications.includes(application.id)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedApplications([...selectedApplications, application.id])
+                      } else {
+                        setSelectedApplications(selectedApplications.filter(id => id !== application.id))
+                      }
+                    }}
+                    className="rounded border-[#15397F]"
+                  />
+                </TableCell>
                 <TableCell className="font-medium">
                   <div className="flex items-center gap-2">
                     <Avatar className="w-8 h-8 border border-[#15397F]">
@@ -166,28 +491,13 @@ export default function AdminDashboard() {
         </Table>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <p className="text-sm text-muted-foreground">
-          Showing 1 to 10 of 256 results
-        </p>
-        <div className="flex gap-2">
-          <Button variant="outline" disabled className="border-[#15397F] text-foreground">
-            Previous
-          </Button>
-          <Button variant="outline" className="border-[#15397F] bg-[#15397F] text-[#FFDA00]">
-            1
-          </Button>
-          <Button variant="outline" className="border-[#15397F] text-foreground hover:bg-[#15397F] hover:text-[#FFDA00]">
-            2
-          </Button>
-          <Button variant="outline" className="border-[#15397F] text-foreground hover:bg-[#15397F] hover:text-[#FFDA00]">
-            3
-          </Button>
-          <Button variant="outline" className="border-[#15397F] text-foreground hover:bg-[#15397F] hover:text-[#FFDA00]">
-            Next
-          </Button>
-        </div>
-      </div>
+      <TablePagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        totalItems={filteredApplications.length}
+        itemsPerPage={ITEMS_PER_PAGE}
+      />
     </div>
   )
 }

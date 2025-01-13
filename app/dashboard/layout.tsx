@@ -1,3 +1,5 @@
+// app/dashboard/layout.tsx
+  
 import { TubelightNavbar } from "@/components/ui/tubelight-navbar"
 
 export default function DashboardLayout({
@@ -6,9 +8,10 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   return (
-    <>
-      <TubelightNavbar />
-      {children}
-    </>
+    <div className="min-h-screen flex flex-col">
+      <main className="flex-1">
+        {children}
+      </main>
+    </div>
   )
 } 

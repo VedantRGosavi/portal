@@ -1,3 +1,5 @@
+// app/profile/page.tsx
+
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -16,8 +18,7 @@ export default function ProfileSettings() {
     display_name: '',
     email: '',
     dob: '',
-    school: '',
-    role: ''
+    school: ''
   })
 
   useEffect(() => {
@@ -35,8 +36,7 @@ export default function ProfileSettings() {
             display_name: data.display_name || '',
             email: data.email || '',
             dob: data.dob ? new Date(data.dob).toISOString().split('T')[0] : '',
-            school: data.school || '',
-            role: data.role || ''
+            school: data.school || ''
           })
         }
       }
@@ -66,7 +66,6 @@ export default function ProfileSettings() {
           email: formData.email,
           dob: formData.dob,
           school: formData.school,
-          role: formData.role,
           is_profile_complete: true,
           updated_at: new Date().toISOString()
         })
@@ -83,19 +82,19 @@ export default function ProfileSettings() {
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-4">
-      <Card className="overflow-hidden bg-black border border-zinc-800">
+    <div className="container mx-auto p-4 sm:p-6 md:p-8">
+      <Card className="max-w-2xl mx-auto bg-black border-[#005CB9]">
         <CardContent className="p-6">
           <div className="flex flex-col items-center text-center mb-6">
-            <h1 className="text-2xl font-bold text-white">Profile Settings</h1>
-            <p className="text-balance text-gray-400">
+            <h1 className="text-2xl font-bold text-[#FFDA00]">Profile Settings</h1>
+            <p className="text-muted-foreground">
               Update your personal information
             </p>
           </div>
           
           <div className="space-y-4">
             <div className="grid gap-2">
-              <Label htmlFor="display_name" className="text-white">
+              <Label htmlFor="display_name" className="text-foreground">
                 Display Name
               </Label>
               <Input
@@ -104,12 +103,12 @@ export default function ProfileSettings() {
                 name="display_name"
                 value={formData.display_name}
                 onChange={handleChange}
-                className="bg-zinc-900 border-zinc-800 text-white"
+                className="bg-zinc-900 border-[#005CB9] text-foreground focus:ring-[#FFDA00] focus:border-[#FFDA00]"
               />
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="email" className="text-white">
+              <Label htmlFor="email" className="text-foreground">
                 Email
               </Label>
               <Input
@@ -118,12 +117,12 @@ export default function ProfileSettings() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="bg-zinc-900 border-zinc-800 text-white"
+                className="bg-zinc-900 border-[#005CB9] text-foreground focus:ring-[#FFDA00] focus:border-[#FFDA00]"
               />
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="dob" className="text-white">
+              <Label htmlFor="dob" className="text-foreground">
                 Date of Birth
               </Label>
               <Input
@@ -132,12 +131,12 @@ export default function ProfileSettings() {
                 name="dob"
                 value={formData.dob}
                 onChange={handleChange}
-                className="bg-zinc-900 border-zinc-800 text-white"
+                className="bg-zinc-900 border-[#005CB9] text-foreground focus:ring-[#FFDA00] focus:border-[#FFDA00]"
               />
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="school" className="text-white">
+              <Label htmlFor="school" className="text-foreground">
                 School
               </Label>
               <Input
@@ -146,22 +145,7 @@ export default function ProfileSettings() {
                 name="school"
                 value={formData.school}
                 onChange={handleChange}
-                className="bg-zinc-900 border-zinc-800 text-white"
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="role" className="text-white">
-                Role
-              </Label>
-              <Input
-                type="text"
-                id="role"
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                className="bg-zinc-900 border-zinc-800 text-white"
-                disabled
+                className="bg-zinc-900 border-[#005CB9] text-foreground focus:ring-[#FFDA00] focus:border-[#FFDA00]"
               />
             </div>
 
@@ -169,7 +153,7 @@ export default function ProfileSettings() {
               <Button 
                 onClick={handleSaveChanges}
                 disabled={loading}
-                className="bg-[#15397F] text-[#FFDA00] hover:bg-[#FFDA00] hover:text-[#15397F]"
+                className="bg-[#005CB9] text-[#FFDA00] hover:bg-[#FFDA00] hover:text-[#005CB9]"
               >
                 {loading ? 'Saving...' : 'Save Changes'}
               </Button>

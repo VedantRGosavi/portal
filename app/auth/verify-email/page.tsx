@@ -1,3 +1,5 @@
+// app/auth/verify-email/page.tsx
+
 export default function VerifyEmailPage() {
   return (
     <div className="text-center">

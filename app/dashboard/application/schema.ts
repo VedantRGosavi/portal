@@ -1,13 +1,18 @@
 import { z } from "zod"
+// app/dashboard/application/schema.ts
+const phoneRegex = /^\+?[1-9]\d{1,14}$/;
 
 export const applicationFormSchema = z.object({
   // Add these fields at the top
   user_id: z.string().uuid().optional(),
-  status: z.enum(["Under Review", "Accepted", "Rejected"]).optional(),
+  status: z.enum(["Draft", "Under Review", "Accepted", "Rejected"]).optional(),
   updated_at: z.string().optional(),
   
   // Basic Info
-  phone_number: z.string().nullable(),
+  phone_number: z.string().nullable().refine((val) => {
+    if (!val) return true;
+    return phoneRegex.test(val);
+  }, "Invalid phone number format"),
   address: z.string().nullable(),
   citizenship: z.string().nullable(),
   
@@ -15,7 +20,7 @@ export const applicationFormSchema = z.object({
   is_student: z.boolean(),
   school: z.string().nullable(),
   study_level: z.string().nullable(),
-  graduation_year: z.number().nullable(),
+  graduation_year: z.coerce.number().nullable(),
   major: z.string().nullable(),
   
   // Experience
@@ -41,7 +46,10 @@ export const applicationFormSchema = z.object({
   
   // Emergency Contact
   emergency_contact_name: z.string().nullable(),
-  emergency_contact_phone: z.string().nullable(),
+  emergency_contact_phone: z.string().nullable().refine((val) => {
+    if (!val) return true;
+    return phoneRegex.test(val);
+  }, "Invalid phone number format"),
   emergency_contact_relation: z.string().nullable(),
   
   // Demographics
