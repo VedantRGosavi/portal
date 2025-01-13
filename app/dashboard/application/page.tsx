@@ -323,6 +323,14 @@ export default function ApplicationForm() {
           <Form {...form}>
             <form 
               onSubmit={form.handleSubmit(onSubmit)} 
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && e.target instanceof HTMLElement) {
+                  // Allow Enter key in textareas
+                  if (e.target.tagName !== 'TEXTAREA') {
+                    e.preventDefault();
+                  }
+                }
+              }}
               className="space-y-8 bg-black/50 backdrop-blur-sm rounded-lg p-6 border border-[#005CB9]/30" 
               noValidate
             >
@@ -375,16 +383,39 @@ export default function ApplicationForm() {
                               <SelectValue placeholder="Select your citizenship" />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent className="bg-black border-[#005CB9]">
-                            {countries.map((country) => (
-                              <SelectItem 
-                                key={country} 
-                                value={country}
-                                className="text-white hover:bg-[#005CB9] hover:text-[#FFDA00]"
-                              >
-                                {country}
-                              </SelectItem>
-                            ))}
+                          <SelectContent className="bg-black border-[#005CB9] relative">
+                            <div className="sticky top-0 z-10 bg-black p-2 border-b border-[#005CB9]">
+                              <Input
+                                placeholder="Search countries..."
+                                className="bg-zinc-900 border-[#005CB9] text-white"
+                                onChange={(e) => {
+                                  const selectContent = document.querySelector('[role="listbox"]');
+                                  if (selectContent) {
+                                    const items = selectContent.querySelectorAll('[role="option"]');
+                                    items.forEach((item) => {
+                                      const text = item.textContent?.toLowerCase() || '';
+                                      const search = e.target.value.toLowerCase();
+                                      if (text.includes(search)) {
+                                        (item as HTMLElement).style.display = '';
+                                      } else {
+                                        (item as HTMLElement).style.display = 'none';
+                                      }
+                                    });
+                                  }
+                                }}
+                              />
+                            </div>
+                            <div className="max-h-[200px] overflow-y-auto pt-1">
+                              {countries.map((country) => (
+                                <SelectItem 
+                                  key={country} 
+                                  value={country}
+                                  className="text-white hover:bg-[#005CB9] hover:text-[#FFDA00]"
+                                >
+                                  {country}
+                                </SelectItem>
+                              ))}
+                            </div>
                           </SelectContent>
                         </Select>
                         <FormMessage className="text-[#FFDA00]" />

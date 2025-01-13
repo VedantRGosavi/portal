@@ -12,9 +12,9 @@ export default function Home(): ReactElement {
   const router = useRouter()
 
   return (
-    <main className="relative min-h-screen flex flex-col items-center justify-center">
+    <main className="relative h-screen w-full flex flex-col items-center justify-center overflow-hidden">
       {/* Background Flickering Grid */}
-      <div className="absolute inset-0 z-0">
+      <div className="fixed inset-0 w-full h-full z-0">
         <FlickeringGrid
           color="#15397F"
           maxOpacity={0.15}
@@ -25,7 +25,7 @@ export default function Home(): ReactElement {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 text-center space-y-8 p-4">
+      <div className="relative z-10 text-center space-y-8 p-4 max-w-7xl mx-auto">
         <div className="space-y-6">
           <img
             src="/images/logo.svg"
