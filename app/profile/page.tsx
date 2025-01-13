@@ -66,6 +66,8 @@ export default function ProfileSettings() {
   }
 
   const handleSaveChanges = async () => {
+    if (loading) return;
+    
     try {
       setLoading(true)
       const { data: { user } } = await supabase.auth.getUser()
@@ -93,16 +95,21 @@ export default function ProfileSettings() {
 
       if (error) throw error
 
+      // Start navigation immediately
+      router.prefetch('/dashboard')
+      
       toast({
         title: "Success",
         description: "Profile updated successfully!",
       })
 
-      // Wait for the toast to be visible before redirecting
-      setTimeout(() => {
+      // Reduce timeout to minimum and use Promise.all for parallel execution
+      await Promise.all([
+        new Promise(resolve => setTimeout(resolve, 100)), // Minimal delay for toast visibility
         router.push('/dashboard')
-        router.refresh() // Force a refresh of the dashboard data
-      }, 500)
+      ])
+      
+      router.refresh()
     } catch (error) {
       console.error('Error updating profile:', error)
       toast({
