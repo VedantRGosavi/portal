@@ -36,36 +36,34 @@ export async function GET(request: Request) {
       // Check if this is a login attempt (user already exists)
       const { data: existingProfile } = await supabase
         .from('profile')
-        .select('id')
+        .select('id, is_profile_complete')
         .eq('id', session.user.id)
         .single()
 
-      // If no existing profile and this is a login attempt (not signup)
-      if (!existingProfile && requestUrl.pathname === '/auth/callback') {
-        // Delete the newly created auth user since this was a login attempt
-        await supabase.auth.admin.deleteUser(session.user.id)
-        return NextResponse.redirect(
-          new URL('/auth/login?error=no_account', requestUrl.origin)
-        )
+      // Handle profile creation for email/password signups after verification
+      if (!existingProfile && session.user.app_metadata.provider === 'email') {
+        await supabase
+          .from('profile')
+          .insert({
+            id: session.user.id,
+            email: session.user.email,
+            display_name: session.user.email?.split('@')[0] || 'User',
+            role: 'applicant',
+            is_profile_complete: false,
+            created_at: new Date().toISOString()
+          })
       }
-
+      
       // Handle profile creation for OAuth providers
       if (session.user.app_metadata.provider === 'github' || session.user.app_metadata.provider === 'google') {
-        const { data: existingProfile } = await supabase
-          .from('profile')
-          .select('id')
-          .eq('id', session.user.id)
-          .single()
-
         if (!existingProfile) {
-          // Get display name from various possible OAuth metadata fields
           const metadata = session.user.user_metadata
           const displayName = metadata.full_name || 
-                            metadata.name ||
-                            metadata.user_name || 
-                            metadata.username || 
-                            session.user.email?.split('@')[0] || 
-                            'User'
+                          metadata.name ||
+                          metadata.user_name || 
+                          metadata.username || 
+                          session.user.email?.split('@')[0] || 
+                          'User'
 
           await supabase
             .from('profile')
@@ -80,23 +78,21 @@ export async function GET(request: Request) {
         }
       }
 
-      // Check if profile is complete
-      const { data: profile } = await supabase
-        .from('profile')
-        .select('is_profile_complete')
-        .eq('id', session.user.id)
-        .single()
-
-      if (!profile?.is_profile_complete) {
+      // Redirect based on profile completion status
+      if (!existingProfile?.is_profile_complete) {
         return NextResponse.redirect(new URL('/profile', requestUrl.origin))
       }
 
       return NextResponse.redirect(new URL('/dashboard', requestUrl.origin))
     } catch (error) {
       console.error('Auth error:', error)
-      return NextResponse.redirect(new URL('/auth/login', requestUrl.origin))
+      return NextResponse.redirect(
+        new URL('/auth/login?error=auth_error', requestUrl.origin)
+      )
     }
   }
 
-  return NextResponse.redirect(new URL('/auth/login', requestUrl.origin))
+  return NextResponse.redirect(
+    new URL('/auth/login?error=no_code', requestUrl.origin)
+  )
 } 

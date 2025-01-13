@@ -25,6 +25,14 @@ export const createClient = async () => {
           }
         },
       },
+      global: {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          'Prefer': 'return=minimal'
+        },
+      },
     },
   );
 };

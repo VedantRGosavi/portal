@@ -73,42 +73,6 @@ export default function SignUpPage() {
     };
   };
 
-  const createOrUpdateProfile = async (supabase: any, userId: string, userEmail: string) => {
-    try {
-      // First check if profile exists
-      const { data: existingProfile, error: fetchError } = await supabase
-        .from('profile')
-        .select('id')
-        .eq('id', userId)
-        .single();
-
-      if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 is "not found" error
-        throw fetchError;
-      }
-
-      // If profile doesn't exist, create it using upsert
-      const { error: upsertError } = await supabase
-        .from('profile')
-        .upsert({
-          id: userId,
-          email: userEmail,
-          role: 'applicant',
-          is_profile_complete: false,
-          updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'id',
-          ignoreDuplicates: false
-        });
-
-      if (upsertError) {
-        throw upsertError;
-      }
-    } catch (error) {
-      console.error("Profile creation/update error:", error);
-      throw error;
-    }
-  };
-
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) {
       e.preventDefault();
@@ -137,7 +101,7 @@ export default function SignUpPage() {
       }
 
       // Sign up the user with Supabase Auth
-      const { data: { session, user }, error: signUpError } = await supabase.auth.signUp({
+      const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -151,33 +115,6 @@ export default function SignUpPage() {
       if (signUpError) {
         console.error("Auth Error:", signUpError);
         throw signUpError;
-      }
-
-      if (!user?.id) {
-        throw new Error("No user ID returned from signup");
-      }
-
-      // Create or update user profile with retry logic
-      let retryCount = 0;
-      const maxRetries = 3;
-      
-      while (retryCount < maxRetries) {
-        try {
-          await createOrUpdateProfile(supabase, user.id, email);
-          break; // Success, exit the retry loop
-        } catch (profileError) {
-          retryCount++;
-          console.error(`Profile creation attempt ${retryCount} failed:`, profileError);
-          
-          if (retryCount === maxRetries) {
-            // If all retries failed, sign out and throw error
-            await supabase.auth.signOut();
-            throw new Error("Failed to create profile after multiple attempts. Please try again.");
-          }
-          
-          // Wait before retrying (exponential backoff)
-          await new Promise(resolve => setTimeout(resolve, Math.min(1000 * Math.pow(2, retryCount), 5000)));
-        }
       }
 
       setShowVerifyDialog(true);

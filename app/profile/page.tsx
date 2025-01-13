@@ -8,11 +8,13 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useToast } from '@/hooks/use-toast'
 
 export default function ProfileSettings() {
   const router = useRouter()
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
+  const { toast } = useToast()
   
   const [formData, setFormData] = useState({
     display_name: '',
@@ -23,22 +25,33 @@ export default function ProfileSettings() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        const { data } = await supabase
-          .from('profile')
-          .select('*')
-          .eq('id', user.id)
-          .single()
-        
-        if (data) {
-          setFormData({
-            display_name: data.display_name || '',
-            email: data.email || '',
-            dob: data.dob ? new Date(data.dob).toISOString().split('T')[0] : '',
-            school: data.school || ''
-          })
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          const { data, error } = await supabase
+            .from('profile')
+            .select('*')
+            .eq('id', user.id)
+            .single()
+          
+          if (error) throw error
+          
+          if (data) {
+            setFormData({
+              display_name: data.display_name || '',
+              email: data.email || '',
+              dob: data.dob ? new Date(data.dob).toISOString().split('T')[0] : '',
+              school: data.school || ''
+            })
+          }
         }
+      } catch (error) {
+        console.error('Error fetching profile:', error)
+        toast({
+          title: "Error",
+          description: "Failed to load profile data. Please try refreshing the page.",
+          variant: "destructive",
+        })
       }
     }
     fetchProfile()
@@ -57,7 +70,14 @@ export default function ProfileSettings() {
       setLoading(true)
       const { data: { user } } = await supabase.auth.getUser()
       
-      if (!user) throw new Error('No user found')
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "No user found. Please try logging in again.",
+          variant: "destructive",
+        })
+        return
+      }
 
       const { error } = await supabase
         .from('profile')
@@ -73,9 +93,23 @@ export default function ProfileSettings() {
 
       if (error) throw error
 
-      router.push('/dashboard')
+      toast({
+        title: "Success",
+        description: "Profile updated successfully!",
+      })
+
+      // Wait for the toast to be visible before redirecting
+      setTimeout(() => {
+        router.push('/dashboard')
+        router.refresh() // Force a refresh of the dashboard data
+      }, 500)
     } catch (error) {
       console.error('Error updating profile:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive",
+      })
     } finally {
       setLoading(false)
     }
