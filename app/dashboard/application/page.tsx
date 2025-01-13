@@ -89,44 +89,44 @@ export default function ApplicationForm() {
   const form = useForm<ApplicationFormValues>({
     resolver: zodResolver(applicationFormSchema),
     defaultValues: {
-      phone_number: null,
-      address: null,
-      citizenship: null,
+      phone_number: '',
+      address: '',
+      citizenship: '',
       technical_skills: [],
       programming_languages: [],
       ethnicity: [],
       is_student: false,
-      school: null,
-      study_level: null,
+      school: '',
+      study_level: '',
       graduation_year: null,
-      major: null,
+      major: '',
       attended_mlh: false,
       hackathon_experience: false,
-      hackathon_experience_desc: null,
+      hackathon_experience_desc: '',
       has_team: false,
       needs_teammates: false,
-      desired_teammate_skills: null,
-      goals: null,
-      heard_from: null,
+      desired_teammate_skills: '',
+      goals: '',
+      heard_from: '',
       needs_sponsorship: false,
       accessibility_needs: false,
-      accessibility_desc: null,
+      accessibility_desc: '',
       dietary_restrictions: false,
-      dietary_desc: null,
-      emergency_contact_name: null,
-      emergency_contact_phone: null,
-      emergency_contact_relation: null,
-      tshirt_size: null,
+      dietary_desc: '',
+      emergency_contact_name: '',
+      emergency_contact_phone: '',
+      emergency_contact_relation: '',
+      tshirt_size: '',
       underrepresented: false,
       mlh_code_of_conduct: false,
       mlh_data_sharing: false,
       mlh_communications: false,
       info_accurate: false,
       understands_admission: false,
-      resume_url: null,
-      linkedin_url: null,
-      github_url: null,
-      portfolio_url: null,
+      resume_url: '',
+      linkedin_url: '',
+      github_url: '',
+      portfolio_url: '',
     },
   })
 
@@ -1111,7 +1111,7 @@ export default function ApplicationForm() {
                           <Input 
                             placeholder="https://linkedin.com/in/your-profile" 
                             {...field}
-                            value={field.value || undefined}
+                            value={field.value ?? ''}
                             className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]"
                           />
                         </FormControl>
@@ -1130,7 +1130,7 @@ export default function ApplicationForm() {
                           <Input 
                             placeholder="https://github.com/your-username" 
                             {...field}
-                            value={field.value || undefined}
+                            value={field.value ?? ''}
                             className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]"
                           />
                         </FormControl>
@@ -1149,7 +1149,7 @@ export default function ApplicationForm() {
                           <Input 
                             placeholder="https://your-portfolio.com" 
                             {...field}
-                            value={field.value || undefined}
+                            value={field.value ?? ''}
                             className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]"
                           />
                         </FormControl>
