@@ -63,6 +63,12 @@ export const applicationFormSchema = z.object({
   mlh_communications: z.boolean(),
   info_accurate: z.boolean(),
   understands_admission: z.boolean(),
+  
+  // Links & Documents
+  resume_url: z.string().nullable(),
+  linkedin_url: z.string().url().nullish().or(z.literal('')),
+  github_url: z.string().url().nullish().or(z.literal('')),
+  portfolio_url: z.string().url().nullish().or(z.literal('')),
 })
 
 export type ApplicationFormValues = z.infer<typeof applicationFormSchema> 

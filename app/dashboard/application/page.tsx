@@ -10,6 +10,7 @@ import { useState, useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { FORM_CONSTANTS } from "@/app/lib/constants/form-constants";
 import { cleanFormData, handleError } from "@/app/lib/utils/form-utils";
+import { FileIcon } from "lucide-react"
 
 
 import {
@@ -35,6 +36,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Textarea } from "@/components/ui/textarea"
 import { Card } from "@/components/ui/card"
 import { countries } from "@/lib/constants/countries"
+import { ApplicationReadOnlyView } from "@/components/ui/application-read-only-view"
 
 const TSHIRT_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"]
 const STUDY_LEVELS = ["High School", "Undergraduate", "Graduate", "Doctorate", "Other"]
@@ -121,6 +123,10 @@ export default function ApplicationForm() {
       mlh_communications: false,
       info_accurate: false,
       understands_admission: false,
+      resume_url: null,
+      linkedin_url: null,
+      github_url: null,
+      portfolio_url: null,
     },
   })
 
@@ -174,6 +180,56 @@ export default function ApplicationForm() {
     checkExistingApplication()
   }, [form])
 
+  // Handle resume upload
+  const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      const file = e.target.files?.[0]
+      if (!file) return
+
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast({
+          title: "Error",
+          description: "Resume file size must be less than 5MB",
+          variant: "destructive",
+        })
+        return
+      }
+
+      const { data: { user }, error: userError } = await supabase.auth.getUser()
+      if (userError || !user) {
+        throw userError || new Error('User not found')
+      }
+
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`
+
+      const { error: uploadError } = await supabase
+        .storage
+        .from('resumes')
+        .upload(fileName, file)
+
+      if (uploadError) throw uploadError
+
+      const { data: { publicUrl } } = supabase
+        .storage
+        .from('resumes')
+        .getPublicUrl(fileName)
+
+      form.setValue('resume_url', publicUrl)
+      
+      toast({
+        title: "Success",
+        description: "Resume uploaded successfully",
+      })
+    } catch (error) {
+      console.error('Error uploading resume:', error)
+      toast({
+        title: "Error",
+        description: "Failed to upload resume. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
 
   const onSubmit = async (values: ApplicationFormValues) => {
     // Only block submission if there's an existing submitted application
@@ -262,190 +318,8 @@ export default function ApplicationForm() {
           )}
         </div>
         {existingApplication ? (
-          // Show read-only view of the application
-          <div className="p-6 space-y-8">
-            {/* Each section is wrapped in a styled card */}
-            <div className="bg-black/30 rounded-lg p-6 border border-[#005CB9]/20">
-              <h2 className="text-xl font-semibold text-[#FFDA00] mb-6">Basic Information</h2>
-              <div className="grid gap-6 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <h3 className="font-medium text-white">Phone Number</h3>
-                  <p className="text-muted-foreground">{existingApplication.phone_number || 'Not provided'}</p>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium text-white">Address</h3>
-                  <p className="text-muted-foreground">{existingApplication.address || 'Not provided'}</p>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium text-white">Citizenship</h3>
-                  <p className="text-muted-foreground">{existingApplication.citizenship || 'Not provided'}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-black/30 rounded-lg p-6 border border-[#005CB9]/20">
-              <h2 className="text-xl font-semibold text-[#FFDA00] mb-6">Education</h2>
-              <div className="grid gap-6 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <h3 className="font-medium text-white">Student Status</h3>
-                  <p className="text-muted-foreground">{existingApplication.is_student ? 'Current Student' : 'Not a Student'}</p>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium text-white">School</h3>
-                  <p className="text-muted-foreground">{existingApplication.school || 'Not provided'}</p>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium text-white">Study Level</h3>
-                  <p className="text-muted-foreground">{existingApplication.study_level || 'Not provided'}</p>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium text-white">Graduation Year</h3>
-                  <p className="text-muted-foreground">{existingApplication.graduation_year || 'Not provided'}</p>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium text-white">Major</h3>
-                  <p className="text-muted-foreground">{existingApplication.major || 'Not provided'}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-black/30 rounded-lg p-6 border border-[#005CB9]/20">
-              <h2 className="text-xl font-semibold text-[#FFDA00] mb-6">Experience</h2>
-              <div className="grid gap-6 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <h3 className="font-medium text-white">MLH Participation</h3>
-                  <p className="text-muted-foreground">{existingApplication.attended_mlh ? 'Yes' : 'No'}</p>
-                </div>
-                <div className="space-y-2 sm:col-span-2">
-                  <h3 className="font-medium text-white">Technical Skills</h3>
-                  <p className="text-muted-foreground">
-                    {existingApplication.technical_skills.length > 0 
-                      ? existingApplication.technical_skills.join(', ') 
-                      : 'None provided'}
-                  </p>
-                </div>
-                <div className="space-y-2 sm:col-span-2">
-                  <h3 className="font-medium text-white">Programming Languages</h3>
-                  <p className="text-muted-foreground">
-                    {existingApplication.programming_languages.length > 0 
-                      ? existingApplication.programming_languages.join(', ') 
-                      : 'None provided'}
-                  </p>
-                </div>
-                <div className="space-y-2 sm:col-span-2">
-                  <h3 className="font-medium text-white">Hackathon Experience</h3>
-                  <p className="text-muted-foreground">{existingApplication.hackathon_experience ? 'Yes' : 'No'}</p>
-                  {existingApplication.hackathon_experience_desc && (
-                    <p className="text-muted-foreground mt-2">{existingApplication.hackathon_experience_desc}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-black/30 rounded-lg p-6 border border-[#005CB9]/20">
-              <h2 className="text-xl font-semibold text-[#FFDA00] mb-6">Team & Goals</h2>
-              <div className="grid gap-6 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <h3 className="font-medium text-white">Has Team</h3>
-                  <p className="text-muted-foreground">{existingApplication.has_team ? 'Yes' : 'No'}</p>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium text-white">Looking for Teammates</h3>
-                  <p className="text-muted-foreground">{existingApplication.needs_teammates ? 'Yes' : 'No'}</p>
-                </div>
-                {existingApplication.desired_teammate_skills && (
-                  <div className="space-y-2 sm:col-span-2">
-                    <h3 className="font-medium text-white">Desired Teammate Skills</h3>
-                    <p className="text-muted-foreground">{existingApplication.desired_teammate_skills}</p>
-                  </div>
-                )}
-                <div className="space-y-2 sm:col-span-2">
-                  <h3 className="font-medium text-white">Goals</h3>
-                  <p className="text-muted-foreground">{existingApplication.goals || 'Not provided'}</p>
-                </div>
-                <div className="space-y-2 sm:col-span-2">
-                  <h3 className="font-medium text-white">How did you hear about us?</h3>
-                  <p className="text-muted-foreground">{existingApplication.heard_from || 'Not provided'}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-black/30 rounded-lg p-6 border border-[#005CB9]/20">
-              <h2 className="text-xl font-semibold text-[#FFDA00] mb-6">Support Needs</h2>
-              <div className="grid gap-6 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <h3 className="font-medium text-white">Needs Sponsorship</h3>
-                  <p className="text-muted-foreground">{existingApplication.needs_sponsorship ? 'Yes' : 'No'}</p>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium text-white">Accessibility Needs</h3>
-                  <p className="text-muted-foreground">{existingApplication.accessibility_needs ? 'Yes' : 'No'}</p>
-                  {existingApplication.accessibility_desc && (
-                    <p className="text-muted-foreground mt-2">{existingApplication.accessibility_desc}</p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium text-white">Dietary Restrictions</h3>
-                  <p className="text-muted-foreground">{existingApplication.dietary_restrictions ? 'Yes' : 'No'}</p>
-                  {existingApplication.dietary_desc && (
-                    <p className="text-muted-foreground mt-2">{existingApplication.dietary_desc}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-black/30 rounded-lg p-6 border border-[#005CB9]/20">
-              <h2 className="text-xl font-semibold text-[#FFDA00] mb-6">Emergency Contact</h2>
-              <div className="grid gap-6 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <h3 className="font-medium text-white">Name</h3>
-                  <p className="text-muted-foreground">{existingApplication.emergency_contact_name || 'Not provided'}</p>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium text-white">Phone</h3>
-                  <p className="text-muted-foreground">{existingApplication.emergency_contact_phone || 'Not provided'}</p>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium text-white">Relationship</h3>
-                  <p className="text-muted-foreground">{existingApplication.emergency_contact_relation || 'Not provided'}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-black/30 rounded-lg p-6 border border-[#005CB9]/20">
-              <h2 className="text-xl font-semibold text-[#FFDA00] mb-6">Additional Information</h2>
-              <div className="grid gap-6 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <h3 className="font-medium text-white">T-Shirt Size</h3>
-                  <p className="text-muted-foreground">{existingApplication.tshirt_size || 'Not provided'}</p>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium text-white">Ethnicity</h3>
-                  <p className="text-muted-foreground">
-                    {existingApplication.ethnicity.length > 0 
-                      ? existingApplication.ethnicity.join(', ') 
-                      : 'Not provided'}
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium text-white">Underrepresented Group</h3>
-                  <p className="text-muted-foreground">{existingApplication.underrepresented ? 'Yes' : 'No'}</p>
-                </div>
-              </div>
-            </div>
-            <div className="flex justify-end pt-6">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.push('/dashboard')}
-                className="bg-[#005CB9]/10 hover:bg-[#005CB9]/20 text-white border-[#005CB9]"
-              >
-                Back to Dashboard
-              </Button>
-            </div>
-          </div>
+          <ApplicationReadOnlyView application={existingApplication} />
         ) : (
-          // Show the form
           <Form {...form}>
             <form 
               onSubmit={form.handleSubmit(onSubmit)} 
@@ -1181,6 +1055,105 @@ export default function ApplicationForm() {
                         <div className="space-y-1 leading-none">
                           <FormLabel>I understand that submission does not guarantee admission</FormLabel>
                         </div>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              {/* Links & Documents Section */}
+              <div className="space-y-6">
+                <h2 className="text-xl font-semibold text-[#FFDA00]">Links & Documents</h2>
+                <div className="grid gap-4">
+                  <FormField
+                    control={form.control}
+                    name="resume_url"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Resume</FormLabel>
+                        <FormControl>
+                          <div className="flex items-center gap-4">
+                            <Input
+                              type="file"
+                              accept=".pdf,.doc,.docx"
+                              onChange={handleResumeUpload}
+                              className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]"
+                            />
+                            {field.value && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="border-[#005CB9] text-white hover:bg-[#005CB9] hover:text-[#FFDA00] inline-flex items-center gap-2"
+                                onClick={() => field.value && window.open(field.value, '_blank')}
+                              >
+                                <FileIcon className="h-4 w-4" />
+                                View
+                              </Button>
+                            )}
+                          </div>
+                        </FormControl>
+                        <FormDescription>
+                          Upload your resume (PDF, DOC, or DOCX format, max 5MB)
+                        </FormDescription>
+                        <FormMessage className="text-[#FFDA00]" />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="linkedin_url"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>LinkedIn Profile URL</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="https://linkedin.com/in/your-profile" 
+                            {...field}
+                            value={field.value || undefined}
+                            className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]"
+                          />
+                        </FormControl>
+                        <FormMessage className="text-[#FFDA00]" />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="github_url"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>GitHub Profile URL</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="https://github.com/your-username" 
+                            {...field}
+                            value={field.value || undefined}
+                            className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]"
+                          />
+                        </FormControl>
+                        <FormMessage className="text-[#FFDA00]" />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="portfolio_url"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Portfolio Website URL</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="https://your-portfolio.com" 
+                            {...field}
+                            value={field.value || undefined}
+                            className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]"
+                          />
+                        </FormControl>
+                        <FormMessage className="text-[#FFDA00]" />
                       </FormItem>
                     )}
                   />

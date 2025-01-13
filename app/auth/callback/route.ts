@@ -49,8 +49,8 @@ export async function GET(request: Request) {
         )
       }
 
-      // If this is a new GitHub user, create their profile
-      if (session.user.app_metadata.provider === 'github') {
+      // Handle profile creation for OAuth providers
+      if (session.user.app_metadata.provider === 'github' || session.user.app_metadata.provider === 'google') {
         const { data: existingProfile } = await supabase
           .from('profile')
           .select('id')
@@ -58,14 +58,14 @@ export async function GET(request: Request) {
           .single()
 
         if (!existingProfile) {
-          // Get display name from various possible GitHub metadata fields
+          // Get display name from various possible OAuth metadata fields
           const metadata = session.user.user_metadata
           const displayName = metadata.full_name || 
+                            metadata.name ||
                             metadata.user_name || 
                             metadata.username || 
-                            metadata.name || 
                             session.user.email?.split('@')[0] || 
-                            'GitHub User'
+                            'User'
 
           await supabase
             .from('profile')
