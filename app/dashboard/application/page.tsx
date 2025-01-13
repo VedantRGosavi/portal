@@ -974,7 +974,9 @@ export default function ApplicationForm() {
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
-                          <FormLabel>I agree to follow the MLH Code of Conduct</FormLabel>
+                          <FormLabel>
+                            I agree to follow the <a href="https://github.com/MLH/mlh-policies/blob/main/code-of-conduct.md" target="_blank" rel="noopener noreferrer" className="text-[#005CB9] hover:text-[#FFDA00] underline">MLH Code of Conduct</a>
+                          </FormLabel>
                         </div>
                       </FormItem>
                     )}
@@ -994,7 +996,9 @@ export default function ApplicationForm() {
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
-                          <FormLabel>I agree to MLH's data sharing policy</FormLabel>
+                          <FormLabel>
+                            I agree to <a href="https://github.com/MLH/mlh-policies/blob/main/code-of-conduct.md" target="_blank" rel="noopener noreferrer" className="text-[#005CB9] hover:text-[#FFDA00] underline">MLH's privacy policy</a>
+                          </FormLabel>
                         </div>
                       </FormItem>
                     )}
@@ -1033,7 +1037,7 @@ export default function ApplicationForm() {
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
-                          <FormLabel>I confirm that all information provided is accurate</FormLabel>
+                          <FormLabel>I confirm that all information provided is accurate and allow RocketHacks to share it with sponsors.</FormLabel>
                         </div>
                       </FormItem>
                     )}

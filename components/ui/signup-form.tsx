@@ -91,6 +91,9 @@ export function SignupForm({
                   required
                   className="bg-zinc-900 border-zinc-800 text-white"
                 />
+                <p className="text-sm text-yellow-500">
+                  Please use a non-edu email. We apologize for this inconvenience.
+                </p>
               </div>
 
               <div className="grid gap-2">
