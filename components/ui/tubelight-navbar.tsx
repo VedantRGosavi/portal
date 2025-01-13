@@ -80,6 +80,7 @@ export function TubelightNavbar() {
       if (item.url === "/" && path === "/") return true // Exact match for home
       if (item.url === "/dashboard" && path.startsWith("/dashboard")) return true // Match dashboard and its subroutes
       if (item.url === "/admin" && path.startsWith("/admin")) return true // Match admin and its subroutes
+      if (item.url === "/auth/signup" && path.startsWith("/auth/")) return true // Match auth routes with Apply
       return path === item.url // Exact match for other routes
     })
     
