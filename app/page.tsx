@@ -12,7 +12,7 @@ export default function Home(): ReactElement {
   const router = useRouter()
 
   return (
-    <main className="relative h-screen w-full flex flex-col items-center justify-center overflow-hidden">
+    <main className="relative min-h-[calc(100vh-8rem)] w-full flex flex-col items-center justify-center overflow-hidden pt-8 pb-4">
       {/* Background Flickering Grid */}
       <div className="fixed inset-0 w-full h-full z-0">
         <FlickeringGrid
@@ -26,14 +26,14 @@ export default function Home(): ReactElement {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 text-center space-y-4 sm:space-y-8 p-4 max-w-7xl mx-auto">
-        <div className="space-y-4 sm:space-y-6">
+      <div className="relative z-10 text-center space-y-2 sm:space-y-4 p-4 w-full max-w-[90vw] sm:max-w-7xl mx-auto">
+        <div className="space-y-2 sm:space-y-4">
           <img
             src="/images/logo.svg"
             alt="RocketHacks"
-            className="h-32 sm:h-48 md:h-64 w-auto mx-auto"
+            className="h-24 sm:h-40 md:h-48 w-auto mx-auto"
           />
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight text-white">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight text-white px-2 break-words">
             RocketHacks Application Portal
           </h1>
           <p className="text-xl sm:text-2xl text-[#FFDA00]">
