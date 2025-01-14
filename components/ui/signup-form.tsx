@@ -72,7 +72,7 @@ export function SignupForm({
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold text-white">Create an account</h1>
                 <p className="text-balance text-gray-400">
-                  Sign up for your RocketHacks Inc account
+                  Sign up for your RocketHacks account
                 </p>
               </div>
               
