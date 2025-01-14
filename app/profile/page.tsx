@@ -131,8 +131,12 @@ export default function ProfileSettings() {
             <p className="text-muted-foreground">
               Update your personal information
             </p>
+            <div className="mt-4 p-4 bg-zinc-900/50 rounded-lg border border-[#005CB9] max-w-lg">
+              <p className="text-sm text-[#FFDA00]">
+                Please complete your profile information before accessing other features. This helps us provide you with a better experience.
+              </p>
+            </div>
           </div>
-          
           <div className="space-y-4">
             <div className="grid gap-2">
               <Label htmlFor="display_name" className="text-foreground">
