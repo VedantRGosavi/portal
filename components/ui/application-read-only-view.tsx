@@ -96,6 +96,10 @@ export function ApplicationReadOnlyView({ application }: ApplicationReadOnlyView
             <h3 className="font-medium text-white">Major</h3>
             <p className="text-muted-foreground">{application.major || 'Not provided'}</p>
           </div>
+          <div className="space-y-2">
+            <h3 className="font-medium text-white">School Email</h3>
+            <p className="text-muted-foreground">{application.school_email || 'Not provided'}</p>
+          </div>
         </div>
       </div>
 

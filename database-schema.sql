@@ -95,6 +95,7 @@ create table
     linkedin_url text null,
     github_url text null,
     portfolio_url text null,
+    school_email text null,
     constraint applications_pkey primary key (id),
     constraint unique_user_application unique (user_id),
     constraint applications_user_id_fkey foreign key (user_id) references profile (id) on update cascade on delete cascade,

@@ -28,11 +28,17 @@ export default function Home(): ReactElement {
       {/* Content */}
       <div className="relative z-10 text-center space-y-2 sm:space-y-4 p-4 w-full max-w-[90vw] sm:max-w-7xl mx-auto">
         <div className="space-y-2 sm:space-y-4">
-          <img
-            src="/images/logo.svg"
-            alt="RocketHacks"
-            className="h-24 sm:h-40 md:h-48 w-auto mx-auto"
-          />
+          <a 
+            href="https://rockethacks.org" 
+            target="_blank" 
+            rel="noopener noreferrer"
+          >
+            <img
+              src="/images/logo.svg"
+              alt="RocketHacks"
+              className="h-24 sm:h-40 md:h-48 w-auto mx-auto hover:opacity-80 transition-opacity"
+            />
+          </a>
           <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight text-white px-2 break-words">
             RocketHacks Application Portal
           </h1>

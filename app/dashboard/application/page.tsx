@@ -535,6 +535,29 @@ export default function ApplicationForm() {
                           </FormItem>
                         )}
                       />
+
+                      <FormField
+                        control={form.control}
+                        name="school_email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>School Email</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="email"
+                                placeholder="Enter your school email" 
+                                {...field} 
+                                value={field.value || ''} 
+                                className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]" 
+                              />
+                            </FormControl>
+                            <FormDescription className="text-gray-400">
+                              Please use your official school email address
+                            </FormDescription>
+                            <FormMessage className="text-[#FFDA00]" />
+                          </FormItem>
+                        )}
+                      />
                     </div>
                   )}
                 </div>

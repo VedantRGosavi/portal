@@ -22,7 +22,7 @@ export const applicationFormSchema = z.object({
   study_level: z.string().nullable(),
   graduation_year: z.coerce.number().nullable(),
   major: z.string().nullable(),
-  
+  school_email: z.string().email().nullable(),
   // Experience
   attended_mlh: z.boolean(),
   technical_skills: z.array(z.string()),
