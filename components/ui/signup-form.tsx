@@ -182,8 +182,8 @@ export function SignupForm({
       </Card>
 
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-[#FFDA00]">
-        By signing up, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
+        By signing up, you agree to MLH <a href="https://github.com/MLH/mlh-policies/blob/main/participant-notices-and-agreements.md">Terms of Service</a>{" "}
+        and <a href="https://github.com/MLH/mlh-policies/blob/main/participant-notices-and-agreements.md">Privacy Policy</a>.
       </div>
 
       <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
