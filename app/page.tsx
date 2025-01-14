@@ -26,17 +26,17 @@ export default function Home(): ReactElement {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 text-center space-y-8 p-4 max-w-7xl mx-auto">
-        <div className="space-y-6">
+      <div className="relative z-10 text-center space-y-4 sm:space-y-8 p-4 max-w-7xl mx-auto">
+        <div className="space-y-4 sm:space-y-6">
           <img
             src="/images/logo.svg"
             alt="RocketHacks"
-            className="h-64 w-auto mx-auto"
+            className="h-32 sm:h-48 md:h-64 w-auto mx-auto"
           />
-          <h1 className="text-6xl font-bold tracking-tight text-white">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight text-white">
             RocketHacks Application Portal
           </h1>
-          <p className="text-2xl text-[#FFDA00]">
+          <p className="text-xl sm:text-2xl text-[#FFDA00]">
             March 15-16, 2025
           </p>
         </div>
