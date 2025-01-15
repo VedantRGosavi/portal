@@ -25,8 +25,8 @@ import { useDebounce } from "@/hooks/use-debounce"
 import { VirtualizedSelect } from "@/components/ui/virtualized-select"
 
 const profileSchema = z.object({
-  display_name: z.string().min(1, "Display name is required"),
-  email: z.string().email("Invalid email address"),
+  display_name: z.string().min(1, "Display name is required").max(50, "Display name must be less than 50 characters"),
+  email: z.string().email("Invalid email address").min(1, "Email is required"),
   age: z.string().refine((val) => !val || (parseInt(val) >= 13 && parseInt(val) <= 120), {
     message: "Age must be between 13 and 120",
   }),
@@ -98,18 +98,19 @@ export default function ProfileSettings() {
       
       if (!user) {
         toast({
-          title: "Error",
-          description: "No user found. Please try logging in again.",
+          title: "Authentication Error",
+          description: "Your session has expired. Please log in again.",
           variant: "destructive",
         })
+        router.push('/auth/login')
         return
       }
 
       const { error } = await supabase
         .from('profile')
         .update({
-          display_name: values.display_name,
-          email: values.email,
+          display_name: values.display_name.trim(),
+          email: values.email.trim(),
           age: values.age ? parseInt(values.age) : null,
           school: values.school,
           is_profile_complete: true,
@@ -120,24 +121,33 @@ export default function ProfileSettings() {
       if (error) throw error
       
       toast({
-        title: "Success",
-        description: "Profile updated successfully!",
+        title: "Profile Updated",
+        description: "Your profile has been successfully updated!",
       })
 
-      // Refresh the form with the latest values
+      // Refresh the form with the latest values and redirect
       form.reset(values)
+      router.push('/dashboard')
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating profile:', error)
       toast({
-        title: "Error",
-        description: "Failed to update profile. Please try again.",
+        title: "Update Failed",
+        description: error?.message || "Failed to update profile. Please check your connection and try again.",
         variant: "destructive",
       })
     } finally {
       setLoading(false)
     }
   }
+
+  // Add cleanup for async operations
+  useEffect(() => {
+    const abortController = new AbortController()
+    return () => {
+      abortController.abort()
+    }
+  }, [])
 
   return (
     <div className="container mx-auto p-4 sm:p-6 md:p-8">
@@ -150,7 +160,8 @@ export default function ProfileSettings() {
             </p>
             <div className="mt-4 p-4 bg-zinc-900/50 rounded-lg border border-[#005CB9] max-w-lg">
               <p className="text-sm text-[#FFDA00]">
-                Please complete your profile information before accessing other features. This helps us provide you with a better experience.
+                Please complete your profile information before accessing other features. 
+                Fields marked with * are required.
               </p>
             </div>
           </div>
@@ -163,14 +174,16 @@ export default function ProfileSettings() {
                 render={({ field }) => (
                   <FormItem>
                     <Label htmlFor="display_name" className="text-foreground">
-                      Display Name
+                      Display Name *
                     </Label>
                     <FormControl>
                       <Input
                         {...field}
                         className="bg-zinc-900 border-[#005CB9] text-foreground focus:ring-[#FFDA00] focus:border-[#FFDA00]"
+                        placeholder="Enter your display name"
                       />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -181,15 +194,17 @@ export default function ProfileSettings() {
                 render={({ field }) => (
                   <FormItem>
                     <Label htmlFor="email" className="text-foreground">
-                      Email
+                      Email *
                     </Label>
                     <FormControl>
                       <Input
                         {...field}
                         type="email"
                         className="bg-zinc-900 border-[#005CB9] text-foreground focus:ring-[#FFDA00] focus:border-[#FFDA00]"
+                        placeholder="your.email@example.com"
                       />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -209,8 +224,10 @@ export default function ProfileSettings() {
                         min="13"
                         max="120"
                         className="bg-zinc-900 border-[#005CB9] text-foreground focus:ring-[#FFDA00] focus:border-[#FFDA00]"
+                        placeholder="Enter your age"
                       />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -220,7 +237,7 @@ export default function ProfileSettings() {
                 name="school"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>School</FormLabel>
+                    <FormLabel>School *</FormLabel>
                     <VirtualizedSelect
                       value={field.value}
                       onValueChange={field.onChange}
@@ -229,7 +246,7 @@ export default function ProfileSettings() {
                       options={filteredSchools}
                       placeholder="Select your school"
                     />
-                    <FormMessage className="text-[#FFDA00]" />
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -237,8 +254,8 @@ export default function ProfileSettings() {
               <div className="mt-6 flex justify-end">
                 <Button 
                   type="submit"
-                  disabled={loading}
-                  className="bg-[#005CB9] text-[#FFDA00] hover:bg-[#FFDA00] hover:text-[#005CB9]"
+                  disabled={loading || !form.formState.isDirty}
+                  className="bg-[#005CB9] text-[#FFDA00] hover:bg-[#FFDA00] hover:text-[#005CB9] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Saving...' : 'Save Changes'}
                 </Button>
