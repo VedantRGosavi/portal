@@ -50,16 +50,7 @@ export default function ProfileSettings() {
 
   const form = useForm({
     resolver: zodResolver(profileSchema),
-    defaultValues: {
-      display_name: '',
-      email: '',
-      age: '',
-      school: ''
-    }
-  })
-
-  useEffect(() => {
-    const fetchProfile = async () => {
+    defaultValues: async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {
@@ -72,25 +63,31 @@ export default function ProfileSettings() {
           if (error) throw error
           
           if (data) {
-            form.reset({
+            return {
               display_name: data.display_name || '',
               email: data.email || '',
               age: data.age?.toString() || '',
               school: data.school || ''
-            })
+            }
           }
         }
+        return {
+          display_name: '',
+          email: '',
+          age: '',
+          school: ''
+        }
       } catch (error) {
-        console.error('Error fetching profile:', error)
-        toast({
-          title: "Error",
-          description: "Failed to load profile data. Please try refreshing the page.",
-          variant: "destructive",
-        })
+        console.error('Error fetching initial profile data:', error)
+        return {
+          display_name: '',
+          email: '',
+          age: '',
+          school: ''
+        }
       }
     }
-    fetchProfile()
-  }, [form])
+  })
 
   const handleSaveChanges = async (values: z.infer<typeof profileSchema>) => {
     if (loading) return;
