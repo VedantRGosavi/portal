@@ -118,20 +118,15 @@ export default function ProfileSettings() {
         .eq('id', user.id)
 
       if (error) throw error
-
-      router.prefetch('/dashboard')
       
       toast({
         title: "Success",
         description: "Profile updated successfully!",
       })
 
-      await Promise.all([
-        new Promise(resolve => setTimeout(resolve, 100)),
-        router.push('/dashboard')
-      ])
+      // Refresh the form with the latest values
+      form.reset(values)
       
-      router.refresh()
     } catch (error) {
       console.error('Error updating profile:', error)
       toast({
