@@ -17,7 +17,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { FormControl } from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+
+const profileSchema = z.object({
+  display_name: z.string().min(1, "Display name is required"),
+  email: z.string().email("Invalid email address"),
+  age: z.string().refine((val) => !val || (parseInt(val) >= 13 && parseInt(val) <= 120), {
+    message: "Age must be between 13 and 120",
+  }),
+  school: z.string().min(1, "School is required"),
+})
 
 export default function ProfileSettings() {
   const router = useRouter()
@@ -25,11 +37,14 @@ export default function ProfileSettings() {
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
   
-  const [formData, setFormData] = useState({
-    display_name: '',
-    email: '',
-    age: '',
-    school: ''
+  const form = useForm({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      display_name: '',
+      email: '',
+      age: '',
+      school: ''
+    }
   })
 
   useEffect(() => {
@@ -46,7 +61,7 @@ export default function ProfileSettings() {
           if (error) throw error
           
           if (data) {
-            setFormData({
+            form.reset({
               display_name: data.display_name || '',
               email: data.email || '',
               age: data.age?.toString() || '',
@@ -64,17 +79,9 @@ export default function ProfileSettings() {
       }
     }
     fetchProfile()
-  }, [])
+  }, [form])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
-  }
-
-  const handleSaveChanges = async () => {
+  const handleSaveChanges = async (values: z.infer<typeof profileSchema>) => {
     if (loading) return;
     
     try {
@@ -93,10 +100,10 @@ export default function ProfileSettings() {
       const { error } = await supabase
         .from('profile')
         .update({
-          display_name: formData.display_name,
-          email: formData.email,
-          age: formData.age ? parseInt(formData.age) : null,
-          school: formData.school,
+          display_name: values.display_name,
+          email: values.email,
+          age: values.age ? parseInt(values.age) : null,
+          school: values.school,
           is_profile_complete: true,
           updated_at: new Date().toISOString()
         })
@@ -104,7 +111,6 @@ export default function ProfileSettings() {
 
       if (error) throw error
 
-      // Start navigation immediately
       router.prefetch('/dashboard')
       
       toast({
@@ -112,9 +118,8 @@ export default function ProfileSettings() {
         description: "Profile updated successfully!",
       })
 
-      // Reduce timeout to minimum and use Promise.all for parallel execution
       await Promise.all([
-        new Promise(resolve => setTimeout(resolve, 100)), // Minimal delay for toast visibility
+        new Promise(resolve => setTimeout(resolve, 100)),
         router.push('/dashboard')
       ])
       
@@ -146,112 +151,134 @@ export default function ProfileSettings() {
               </p>
             </div>
           </div>
-          <div className="space-y-4">
-            <div className="grid gap-2">
-              <Label htmlFor="display_name" className="text-foreground">
-                Display Name
-              </Label>
-              <Input
-                type="text"
-                id="display_name"
+          
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSaveChanges)} className="space-y-4">
+              <FormField
+                control={form.control}
                 name="display_name"
-                value={formData.display_name}
-                onChange={handleChange}
-                className="bg-zinc-900 border-[#005CB9] text-foreground focus:ring-[#FFDA00] focus:border-[#FFDA00]"
+                render={({ field }) => (
+                  <FormItem>
+                    <Label htmlFor="display_name" className="text-foreground">
+                      Display Name
+                    </Label>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        className="bg-zinc-900 border-[#005CB9] text-foreground focus:ring-[#FFDA00] focus:border-[#FFDA00]"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="email" className="text-foreground">
-                Email
-              </Label>
-              <Input
-                type="email"
-                id="email"
+              <FormField
+                control={form.control}
                 name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="bg-zinc-900 border-[#005CB9] text-foreground focus:ring-[#FFDA00] focus:border-[#FFDA00]"
+                render={({ field }) => (
+                  <FormItem>
+                    <Label htmlFor="email" className="text-foreground">
+                      Email
+                    </Label>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="email"
+                        className="bg-zinc-900 border-[#005CB9] text-foreground focus:ring-[#FFDA00] focus:border-[#FFDA00]"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="age" className="text-foreground">
-                Age
-              </Label>
-              <Input
-                type="number"
-                id="age"
+              <FormField
+                control={form.control}
                 name="age"
-                min="13"
-                max="120"
-                value={formData.age}
-                onChange={handleChange}
-                className="bg-zinc-900 border-[#005CB9] text-foreground focus:ring-[#FFDA00] focus:border-[#FFDA00]"
+                render={({ field }) => (
+                  <FormItem>
+                    <Label htmlFor="age" className="text-foreground">
+                      Age
+                    </Label>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        min="13"
+                        max="120"
+                        className="bg-zinc-900 border-[#005CB9] text-foreground focus:ring-[#FFDA00] focus:border-[#FFDA00]"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="school" className="text-foreground">
-                School
-              </Label>
-              <Select
+              <FormField
+                control={form.control}
                 name="school"
-                value={formData.school}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, school: value }))}
-              >
-                <FormControl>
-                  <SelectTrigger className="bg-zinc-900 border-[#005CB9] text-white">
-                    <SelectValue placeholder="Select your school" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent className="bg-black border-[#005CB9] relative">
-                  <div className="sticky top-0 z-10 bg-black p-2 border-b border-[#005CB9]">
-                    <Input
-                      placeholder="Search schools..."
-                      className="bg-zinc-900 border-[#005CB9] text-white"
-                      onChange={(e) => {
-                        const selectContent = document.querySelector('[role="listbox"]');
-                        if (selectContent) {
-                          const items = selectContent.querySelectorAll('[role="option"]');
-                          items.forEach((item) => {
-                            const text = item.textContent?.toLowerCase() || '';
-                            const search = e.target.value.toLowerCase();
-                            if (text.includes(search)) {
-                              (item as HTMLElement).style.display = '';
-                            } else {
-                              (item as HTMLElement).style.display = 'none';
-                            }
-                          });
-                        }
-                      }}
-                    />
-                  </div>
-                  <div className="max-h-[200px] overflow-y-auto pt-1">
-                    {schools.map((school) => (
-                      <SelectItem 
-                        key={school} 
-                        value={school}
-                        className="text-white hover:bg-[#005CB9] hover:text-[#FFDA00]"
-                      >
-                        {school}
-                      </SelectItem>
-                    ))}
-                  </div>
-                </SelectContent>
-              </Select>
-            </div>
+                render={({ field }) => (
+                  <FormItem>
+                    <Label htmlFor="school" className="text-foreground">
+                      School
+                    </Label>
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="bg-zinc-900 border-[#005CB9] text-white">
+                          <SelectValue placeholder="Select your school" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-black border-[#005CB9] relative">
+                        <div className="sticky top-0 z-10 bg-black p-2 border-b border-[#005CB9]">
+                          <Input
+                            placeholder="Search schools..."
+                            className="bg-zinc-900 border-[#005CB9] text-white"
+                            onChange={(e) => {
+                              const selectContent = document.querySelector('[role="listbox"]');
+                              if (selectContent) {
+                                const items = selectContent.querySelectorAll('[role="option"]');
+                                items.forEach((item) => {
+                                  const text = item.textContent?.toLowerCase() || '';
+                                  const search = e.target.value.toLowerCase();
+                                  if (text.includes(search)) {
+                                    (item as HTMLElement).style.display = '';
+                                  } else {
+                                    (item as HTMLElement).style.display = 'none';
+                                  }
+                                });
+                              }
+                            }}
+                          />
+                        </div>
+                        <div className="max-h-[200px] overflow-y-auto pt-1">
+                          {schools.map((school) => (
+                            <SelectItem 
+                              key={school} 
+                              value={school}
+                              className="text-white hover:bg-[#005CB9] hover:text-[#FFDA00]"
+                            >
+                              {school}
+                            </SelectItem>
+                          ))}
+                        </div>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
 
-            <div className="mt-6 flex justify-end">
-              <Button 
-                onClick={handleSaveChanges}
-                disabled={loading}
-                className="bg-[#005CB9] text-[#FFDA00] hover:bg-[#FFDA00] hover:text-[#005CB9]"
-              >
-                {loading ? 'Saving...' : 'Save Changes'}
-              </Button>
-            </div>
-          </div>
+              <div className="mt-6 flex justify-end">
+                <Button 
+                  type="submit"
+                  disabled={loading}
+                  className="bg-[#005CB9] text-[#FFDA00] hover:bg-[#FFDA00] hover:text-[#005CB9]"
+                >
+                  {loading ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </div>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>
