@@ -46,7 +46,9 @@ export function VirtualizedSelect({
   return (
     <Select value={value} onValueChange={onValueChange}>
       <SelectTrigger className="bg-zinc-900 border-[#005CB9] text-white">
-        <SelectValue placeholder={placeholder} />
+        <SelectValue>
+          {value || placeholder}
+        </SelectValue>
       </SelectTrigger>
       <SelectContent className="bg-black border-[#005CB9] relative">
         <div className="sticky top-0 z-10 bg-black p-2 border-b border-[#005CB9]">
