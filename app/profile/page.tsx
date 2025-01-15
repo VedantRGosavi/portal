@@ -1,7 +1,7 @@
 // app/profile/page.tsx
 
 'use client'
-import { useEffect, useState, useMemo, useCallback } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -33,13 +33,16 @@ const profileSchema = z.object({
   school: z.string().min(1, "School is required"),
 })
 
+// Create Supabase client outside component for consistent identity
+const supabase = createClient()
+
 export default function ProfileSettings() {
   const router = useRouter()
-  const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
   const [schoolSearch, setSchoolSearch] = useState('')
   const debouncedSchoolSearch = useDebounce(schoolSearch, 300)
+  const [isProfileSaved, setIsProfileSaved] = useState(false)
 
   const filteredSchools = useMemo(() => {
     if (!debouncedSchoolSearch) return [...schools]
@@ -53,32 +56,40 @@ export default function ProfileSettings() {
     defaultValues: async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-          const { data, error } = await supabase
-            .from('profile')
-            .select('*')
-            .eq('id', user.id)
-            .single()
-          
-          if (error) throw error
-          
-          if (data) {
-            return {
-              display_name: data.display_name || '',
-              email: data.email || '',
-              age: data.age?.toString() || '',
-              school: data.school || ''
-            }
+        if (!user) {
+          return {
+            display_name: '',
+            email: '',
+            age: '',
+            school: ''
           }
         }
-        return {
-          display_name: '',
-          email: '',
-          age: '',
-          school: ''
+
+        const { data, error } = await supabase
+          .from('profile')
+          .select('*')
+          .eq('id', user.id)
+          .single()
+        
+        if (error) {
+          console.error('Error fetching profile:', error)
+          throw error
         }
+        
+        return {
+          display_name: data?.display_name || '',
+          email: data?.email || user.email || '',
+          age: data?.age?.toString() || '',
+          school: data?.school || ''
+        }
+
       } catch (error) {
         console.error('Error fetching initial profile data:', error)
+        toast({
+          title: "Error",
+          description: "Failed to load profile data. Please refresh the page.",
+          variant: "destructive",
+        })
         return {
           display_name: '',
           email: '',
@@ -120,13 +131,15 @@ export default function ProfileSettings() {
 
       if (error) throw error
       
+      // Reset form with new values to ensure clean state
+      form.reset(values)
+      setIsProfileSaved(true)
+      
       toast({
         title: "Profile Updated",
         description: "Your profile has been successfully updated!",
       })
 
-      // Refresh the form with the latest values and redirect
-      form.reset(values)
       router.push('/dashboard')
       
     } catch (error: any) {
@@ -251,7 +264,15 @@ export default function ProfileSettings() {
                 )}
               />
 
-              <div className="mt-6 flex justify-end">
+              <div className="mt-6 flex justify-between">
+                <Button 
+                  type="button"
+                  onClick={() => router.push('/dashboard')}
+                  variant="outline"
+                  className="border-[#005CB9] text-[#FFDA00] hover:bg-[#005CB9]"
+                >
+                  Cancel
+                </Button>
                 <Button 
                   type="submit"
                   disabled={loading || !form.formState.isDirty}
