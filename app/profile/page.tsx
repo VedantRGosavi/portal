@@ -1,7 +1,7 @@
 // app/profile/page.tsx
 
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -17,10 +17,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useDebounce } from "@/hooks/use-debounce"
+import { VirtualizedSelect } from "@/components/ui/virtualized-select"
 
 const profileSchema = z.object({
   display_name: z.string().min(1, "Display name is required"),
@@ -36,7 +38,16 @@ export default function ProfileSettings() {
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
-  
+  const [schoolSearch, setSchoolSearch] = useState('')
+  const debouncedSchoolSearch = useDebounce(schoolSearch, 300)
+
+  const filteredSchools = useMemo(() => {
+    if (!debouncedSchoolSearch) return [...schools]
+    return schools.filter(school => 
+      school.toLowerCase().includes(debouncedSchoolSearch.toLowerCase())
+    )
+  }, [debouncedSchoolSearch])
+
   const form = useForm({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -217,53 +228,16 @@ export default function ProfileSettings() {
                 name="school"
                 render={({ field }) => (
                   <FormItem>
-                    <Label htmlFor="school" className="text-foreground">
-                      School
-                    </Label>
-                    <Select
+                    <FormLabel>School</FormLabel>
+                    <VirtualizedSelect
                       value={field.value}
                       onValueChange={field.onChange}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="bg-zinc-900 border-[#005CB9] text-white">
-                          <SelectValue placeholder="Select your school" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="bg-black border-[#005CB9] relative">
-                        <div className="sticky top-0 z-10 bg-black p-2 border-b border-[#005CB9]">
-                          <Input
-                            placeholder="Search schools..."
-                            className="bg-zinc-900 border-[#005CB9] text-white"
-                            onChange={(e) => {
-                              const selectContent = document.querySelector('[role="listbox"]');
-                              if (selectContent) {
-                                const items = selectContent.querySelectorAll('[role="option"]');
-                                items.forEach((item) => {
-                                  const text = item.textContent?.toLowerCase() || '';
-                                  const search = e.target.value.toLowerCase();
-                                  if (text.includes(search)) {
-                                    (item as HTMLElement).style.display = '';
-                                  } else {
-                                    (item as HTMLElement).style.display = 'none';
-                                  }
-                                });
-                              }
-                            }}
-                          />
-                        </div>
-                        <div className="max-h-[200px] overflow-y-auto pt-1">
-                          {schools.map((school) => (
-                            <SelectItem 
-                              key={school} 
-                              value={school}
-                              className="text-white hover:bg-[#005CB9] hover:text-[#FFDA00]"
-                            >
-                              {school}
-                            </SelectItem>
-                          ))}
-                        </div>
-                      </SelectContent>
-                    </Select>
+                      searchValue={schoolSearch}
+                      onSearchChange={setSchoolSearch}
+                      options={filteredSchools}
+                      placeholder="Select your school"
+                    />
+                    <FormMessage className="text-[#FFDA00]" />
                   </FormItem>
                 )}
               />

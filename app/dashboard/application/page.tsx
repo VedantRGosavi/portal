@@ -6,11 +6,13 @@ import { useForm } from "react-hook-form"
 import { ApplicationFormValues, applicationFormSchema } from "./schema"
 import { createClient } from "@/utils/supabase/client"
 import { useRouter } from "next/navigation"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { FORM_CONSTANTS } from "@/app/lib/constants/form-constants";
 import { cleanFormData, handleError } from "@/app/lib/utils/form-utils";
 import { FileIcon } from "lucide-react"
+import { useDebounce } from '@/hooks/use-debounce'
+import { VirtualizedSelect } from '@/components/ui/virtualized-select'
 
 
 import {
@@ -86,7 +88,16 @@ export default function ApplicationForm() {
   const router = useRouter()
   const supabase = createClient()
   const { toast } = useToast()
-  
+  const [schoolSearch, setSchoolSearch] = useState('')
+  const debouncedSchoolSearch = useDebounce(schoolSearch, 300)
+
+  const filteredSchools = useMemo(() => {
+    if (!debouncedSchoolSearch) return Array.from(schools)
+    return Array.from(schools).filter(school => 
+      school.toLowerCase().includes(debouncedSchoolSearch.toLowerCase())
+    )
+  }, [debouncedSchoolSearch])
+
   const form = useForm<ApplicationFormValues>({
     resolver: zodResolver(applicationFormSchema),
     defaultValues: {
@@ -497,47 +508,14 @@ export default function ApplicationForm() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>School</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value || ''}>
-                              <FormControl>
-                                <SelectTrigger className="bg-zinc-900 border-[#005CB9] text-white">
-                                  <SelectValue placeholder="Select your school" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent className="bg-black border-[#005CB9] relative">
-                                <div className="sticky top-0 z-10 bg-black p-2 border-b border-[#005CB9]">
-                                  <Input
-                                    placeholder="Search schools..."
-                                    className="bg-zinc-900 border-[#005CB9] text-white"
-                                    onChange={(e) => {
-                                      const selectContent = document.querySelector('[role="listbox"]');
-                                      if (selectContent) {
-                                        const items = selectContent.querySelectorAll('[role="option"]');
-                                        items.forEach((item) => {
-                                          const text = item.textContent?.toLowerCase() || '';
-                                          const search = e.target.value.toLowerCase();
-                                          if (text.includes(search)) {
-                                            (item as HTMLElement).style.display = '';
-                                          } else {
-                                            (item as HTMLElement).style.display = 'none';
-                                          }
-                                        });
-                                      }
-                                    }}
-                                  />
-                                </div>
-                                <div className="max-h-[200px] overflow-y-auto pt-1">
-                                  {schools.map((school) => (
-                                    <SelectItem 
-                                      key={school} 
-                                      value={school}
-                                      className="text-white hover:bg-[#005CB9] hover:text-[#FFDA00]"
-                                    >
-                                      {school}
-                                    </SelectItem>
-                                  ))}
-                                </div>
-                              </SelectContent>
-                            </Select>
+                            <VirtualizedSelect
+                              value={field.value || ''}
+                              onValueChange={field.onChange}
+                              searchValue={schoolSearch}
+                              onSearchChange={setSchoolSearch}
+                              options={filteredSchools}
+                              placeholder="Select your school"
+                            />
                             <FormMessage className="text-[#FFDA00]" />
                           </FormItem>
                         )}
