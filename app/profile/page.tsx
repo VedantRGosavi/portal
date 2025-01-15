@@ -42,7 +42,6 @@ export default function ProfileSettings() {
   const { toast } = useToast()
   const [schoolSearch, setSchoolSearch] = useState('')
   const debouncedSchoolSearch = useDebounce(schoolSearch, 300)
-  const [isProfileSaved, setIsProfileSaved] = useState(false)
 
   const filteredSchools = useMemo(() => {
     if (!debouncedSchoolSearch) return [...schools]
@@ -76,13 +75,20 @@ export default function ProfileSettings() {
           throw error
         }
         
-        return {
+        // Ensure we're setting the school value correctly
+        const formValues = {
           display_name: data?.display_name || '',
           email: data?.email || user.email || '',
           age: data?.age?.toString() || '',
           school: data?.school || ''
         }
+        
+        // Set the initial school search to match the saved school
+        if (data?.school) {
+          setSchoolSearch(data.school)
+        }
 
+        return formValues
       } catch (error) {
         console.error('Error fetching initial profile data:', error)
         toast({
@@ -130,16 +136,13 @@ export default function ProfileSettings() {
         .eq('id', user.id)
 
       if (error) throw error
-      
-      // Reset form with new values to ensure clean state
-      form.reset(values)
-      setIsProfileSaved(true)
-      
+
       toast({
         title: "Profile Updated",
         description: "Your profile has been successfully updated!",
       })
 
+      // Navigate to dashboard after successful update
       router.push('/dashboard')
       
     } catch (error: any) {
@@ -186,9 +189,7 @@ export default function ProfileSettings() {
                 name="display_name"
                 render={({ field }) => (
                   <FormItem>
-                    <Label htmlFor="display_name" className="text-foreground">
-                      Display Name *
-                    </Label>
+                    <FormLabel>Display Name *</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -206,9 +207,7 @@ export default function ProfileSettings() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <Label htmlFor="email" className="text-foreground">
-                      Email *
-                    </Label>
+                    <FormLabel>Email *</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -227,9 +226,7 @@ export default function ProfileSettings() {
                 name="age"
                 render={({ field }) => (
                   <FormItem>
-                    <Label htmlFor="age" className="text-foreground">
-                      Age
-                    </Label>
+                    <FormLabel>Age</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
