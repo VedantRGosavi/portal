@@ -58,6 +58,14 @@ export function ApplicationReadOnlyView({ application }: ApplicationReadOnlyView
         <h2 className="text-xl font-semibold text-[#FFDA00] mb-6">Basic Information</h2>
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2">
+            <h3 className="font-medium text-white">First Name</h3>
+            <p className="text-muted-foreground">{application.first_name || 'Not provided'}</p>
+          </div>
+          <div className="space-y-2">
+            <h3 className="font-medium text-white">Last Name</h3>
+            <p className="text-muted-foreground">{application.last_name || 'Not provided'}</p>
+          </div>
+          <div className="space-y-2">
             <h3 className="font-medium text-white">Phone Number</h3>
             <p className="text-muted-foreground">{application.phone_number || 'Not provided'}</p>
           </div>
@@ -66,7 +74,7 @@ export function ApplicationReadOnlyView({ application }: ApplicationReadOnlyView
             <p className="text-muted-foreground">{application.address || 'Not provided'}</p>
           </div>
           <div className="space-y-2">
-            <h3 className="font-medium text-white">Citizenship</h3>
+            <h3 className="font-medium text-white">Residency</h3>
             <p className="text-muted-foreground">{application.citizenship || 'Not provided'}</p>
           </div>
         </div>

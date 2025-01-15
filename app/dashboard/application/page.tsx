@@ -37,6 +37,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card } from "@/components/ui/card"
 import { countries } from "@/lib/constants/countries"
 import { ApplicationReadOnlyView } from "@/components/ui/application-read-only-view"
+import { schools } from '@/lib/constants/schools'
 
 const TSHIRT_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"]
 const STUDY_LEVELS = ["High School", "Undergraduate", "Graduate", "Doctorate", "Other"]
@@ -89,6 +90,8 @@ export default function ApplicationForm() {
   const form = useForm<ApplicationFormValues>({
     resolver: zodResolver(applicationFormSchema),
     defaultValues: {
+      first_name: '',
+      last_name: '',
       phone_number: '',
       address: '',
       citizenship: '',
@@ -340,6 +343,44 @@ export default function ApplicationForm() {
                 <div className="grid gap-4 md:grid-cols-2">
                   <FormField
                     control={form.control}
+                    name="first_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-white">First Name</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Enter your first name" 
+                            {...field} 
+                            value={field.value || ''} 
+                            className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]"
+                          />
+                        </FormControl>
+                        <FormMessage className="text-[#FFDA00]" />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="last_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-white">Last Name</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Enter your last name" 
+                            {...field} 
+                            value={field.value || ''} 
+                            className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]"
+                          />
+                        </FormControl>
+                        <FormMessage className="text-[#FFDA00]" />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
                     name="phone_number"
                     render={({ field }) => (
                       <FormItem>
@@ -376,11 +417,11 @@ export default function ApplicationForm() {
                     name="citizenship"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Citizenship</FormLabel>
+                        <FormLabel>Residency</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value || ''}>
                           <FormControl>
                             <SelectTrigger className="bg-zinc-900 border-[#005CB9] text-white">
-                              <SelectValue placeholder="Select your citizenship" />
+                              <SelectValue placeholder="Select your residency" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent className="bg-black border-[#005CB9] relative">
@@ -456,9 +497,47 @@ export default function ApplicationForm() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>School</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Enter your school name" {...field} value={field.value || ''} className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]" />
-                            </FormControl>
+                            <Select onValueChange={field.onChange} value={field.value || ''}>
+                              <FormControl>
+                                <SelectTrigger className="bg-zinc-900 border-[#005CB9] text-white">
+                                  <SelectValue placeholder="Select your school" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent className="bg-black border-[#005CB9] relative">
+                                <div className="sticky top-0 z-10 bg-black p-2 border-b border-[#005CB9]">
+                                  <Input
+                                    placeholder="Search schools..."
+                                    className="bg-zinc-900 border-[#005CB9] text-white"
+                                    onChange={(e) => {
+                                      const selectContent = document.querySelector('[role="listbox"]');
+                                      if (selectContent) {
+                                        const items = selectContent.querySelectorAll('[role="option"]');
+                                        items.forEach((item) => {
+                                          const text = item.textContent?.toLowerCase() || '';
+                                          const search = e.target.value.toLowerCase();
+                                          if (text.includes(search)) {
+                                            (item as HTMLElement).style.display = '';
+                                          } else {
+                                            (item as HTMLElement).style.display = 'none';
+                                          }
+                                        });
+                                      }
+                                    }}
+                                  />
+                                </div>
+                                <div className="max-h-[200px] overflow-y-auto pt-1">
+                                  {schools.map((school) => (
+                                    <SelectItem 
+                                      key={school} 
+                                      value={school}
+                                      className="text-white hover:bg-[#005CB9] hover:text-[#FFDA00]"
+                                    >
+                                      {school}
+                                    </SelectItem>
+                                  ))}
+                                </div>
+                              </SelectContent>
+                            </Select>
                             <FormMessage className="text-[#FFDA00]" />
                           </FormItem>
                         )}
@@ -1029,7 +1108,7 @@ export default function ApplicationForm() {
                         </FormControl>
                         <div className="space-y-1 leading-none">
                           <FormLabel>
-                            I agree to follow the <a href="https://github.com/MLH/mlh-policies/blob/main/code-of-conduct.md" target="_blank" rel="noopener noreferrer" className="text-[#005CB9] hover:text-[#FFDA00] underline">MLH Code of Conduct</a>
+                            I have read and agree to the <a href="https://github.com/MLH/mlh-policies/blob/main/code-of-conduct.md" target="_blank" rel="noopener noreferrer" className="text-[#005CB9] hover:text-[#FFDA00] underline">MLH Code of Conduct</a>
                           </FormLabel>
                         </div>
                       </FormItem>
@@ -1051,7 +1130,7 @@ export default function ApplicationForm() {
                         </FormControl>
                         <div className="space-y-1 leading-none">
                           <FormLabel>
-                            I agree to <a href="https://github.com/MLH/mlh-policies/blob/main/code-of-conduct.md" target="_blank" rel="noopener noreferrer" className="text-[#005CB9] hover:text-[#FFDA00] underline">MLH's privacy policy</a>
+                            I authorize you to share my application/registration information with Major League Hacking for event administration, ranking, and MLH administration in-line with the <a href="https://github.com/MLH/mlh-policies/blob/main/privacy-policy.md" target="_blank" rel="noopener noreferrer" className="text-[#005CB9] hover:text-[#FFDA00] underline">MLH Privacy Policy</a>. I further agree to the terms of both the <a href="https://github.com/MLH/mlh-policies/blob/main/contest-terms.md" target="_blank" rel="noopener noreferrer" className="text-[#005CB9] hover:text-[#FFDA00] underline">MLH Contest Terms and Conditions</a> and the <a href="https://github.com/MLH/mlh-policies/blob/main/privacy-policy.md" target="_blank" rel="noopener noreferrer" className="text-[#005CB9] hover:text-[#FFDA00] underline">MLH Privacy Policy</a>
                           </FormLabel>
                         </div>
                       </FormItem>
@@ -1071,7 +1150,7 @@ export default function ApplicationForm() {
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
-                          <FormLabel>I would like to receive communications from MLH</FormLabel>
+                          <FormLabel>I authorize MLH to send me occasional emails about relevant events, career opportunities, and community announcements</FormLabel>
                         </div>
                       </FormItem>
                     )}
@@ -1091,7 +1170,7 @@ export default function ApplicationForm() {
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
-                          <FormLabel>I confirm that all information provided is accurate and allow RocketHacks to share it with sponsors.</FormLabel>
+                          <FormLabel>I confirm that all information provided is accurate and allow RocketHacks to share it with event sponsors.</FormLabel>
                         </div>
                       </FormItem>
                     )}

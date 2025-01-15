@@ -15,6 +15,8 @@ export const applicationFormSchema = z.object({
   }, "Invalid phone number format"),
   address: z.string().nullable(),
   citizenship: z.string().nullable(),
+  first_name: z.string().nullable(), // Added first_name field
+  last_name: z.string().nullable(), // Added last_name field  
   
   // Education
   is_student: z.boolean(),

@@ -9,6 +9,15 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
+import { schools } from '@/lib/constants/schools'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { FormControl } from "@/components/ui/form"
 
 export default function ProfileSettings() {
   const router = useRouter()
@@ -19,7 +28,7 @@ export default function ProfileSettings() {
   const [formData, setFormData] = useState({
     display_name: '',
     email: '',
-    dob: '',
+    age: '',
     school: ''
   })
 
@@ -40,7 +49,7 @@ export default function ProfileSettings() {
             setFormData({
               display_name: data.display_name || '',
               email: data.email || '',
-              dob: data.dob ? new Date(data.dob).toISOString().split('T')[0] : '',
+              age: data.age?.toString() || '',
               school: data.school || ''
             })
           }
@@ -86,7 +95,7 @@ export default function ProfileSettings() {
         .update({
           display_name: formData.display_name,
           email: formData.email,
-          dob: formData.dob,
+          age: formData.age ? parseInt(formData.age) : null,
           school: formData.school,
           is_profile_complete: true,
           updated_at: new Date().toISOString()
@@ -167,14 +176,16 @@ export default function ProfileSettings() {
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="dob" className="text-foreground">
-                Date of Birth
+              <Label htmlFor="age" className="text-foreground">
+                Age
               </Label>
               <Input
-                type="date"
-                id="dob"
-                name="dob"
-                value={formData.dob}
+                type="number"
+                id="age"
+                name="age"
+                min="13"
+                max="120"
+                value={formData.age}
                 onChange={handleChange}
                 className="bg-zinc-900 border-[#005CB9] text-foreground focus:ring-[#FFDA00] focus:border-[#FFDA00]"
               />
@@ -184,14 +195,51 @@ export default function ProfileSettings() {
               <Label htmlFor="school" className="text-foreground">
                 School
               </Label>
-              <Input
-                type="text"
-                id="school"
+              <Select
                 name="school"
                 value={formData.school}
-                onChange={handleChange}
-                className="bg-zinc-900 border-[#005CB9] text-foreground focus:ring-[#FFDA00] focus:border-[#FFDA00]"
-              />
+                onValueChange={(value) => setFormData(prev => ({ ...prev, school: value }))}
+              >
+                <FormControl>
+                  <SelectTrigger className="bg-zinc-900 border-[#005CB9] text-white">
+                    <SelectValue placeholder="Select your school" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent className="bg-black border-[#005CB9] relative">
+                  <div className="sticky top-0 z-10 bg-black p-2 border-b border-[#005CB9]">
+                    <Input
+                      placeholder="Search schools..."
+                      className="bg-zinc-900 border-[#005CB9] text-white"
+                      onChange={(e) => {
+                        const selectContent = document.querySelector('[role="listbox"]');
+                        if (selectContent) {
+                          const items = selectContent.querySelectorAll('[role="option"]');
+                          items.forEach((item) => {
+                            const text = item.textContent?.toLowerCase() || '';
+                            const search = e.target.value.toLowerCase();
+                            if (text.includes(search)) {
+                              (item as HTMLElement).style.display = '';
+                            } else {
+                              (item as HTMLElement).style.display = 'none';
+                            }
+                          });
+                        }
+                      }}
+                    />
+                  </div>
+                  <div className="max-h-[200px] overflow-y-auto pt-1">
+                    {schools.map((school) => (
+                      <SelectItem 
+                        key={school} 
+                        value={school}
+                        className="text-white hover:bg-[#005CB9] hover:text-[#FFDA00]"
+                      >
+                        {school}
+                      </SelectItem>
+                    ))}
+                  </div>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="mt-6 flex justify-end">
