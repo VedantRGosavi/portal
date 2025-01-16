@@ -85,8 +85,9 @@ export default function Home(): ReactElement {
             </div>
             <div>
               <Link href="" target="_blank">
-                <CenterUnderline 
+                <ComesInGoesOutUnderline 
                   label="ROCKETHACKS ❤️"
+                  direction="right"
                   className="text-white text-lg sm:text-xl uppercase"
                 />
               </Link>

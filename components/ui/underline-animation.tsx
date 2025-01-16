@@ -17,7 +17,7 @@ export function CenterUnderline({ label, className }: Omit<UnderlineProps, "dire
       )}
     >
       {label}
-      <div className="absolute bottom-0 h-[2px] w-full translate-y-1 bg-[#FFDA00] transition-transform duration-300 group-hover:translate-y-0" />
+      <div className="absolute bottom-0 h-[2px] w-full translate-y-1 bg-[#15397F] transition-transform duration-300 group-hover:translate-y-0" />
     </div>
   )
 }
@@ -37,7 +37,7 @@ export function ComesInGoesOutUnderline({
       {label}
       <div
         className={cn(
-          "absolute bottom-0 h-[2px] w-full bg-[#FFDA00] transition-transform duration-300",
+          "absolute bottom-0 h-[2px] w-full bg-[#15397F] transition-transform duration-300",
           direction === "left"
             ? "-translate-x-full group-hover:translate-x-0"
             : "translate-x-full group-hover:translate-x-0"
@@ -62,7 +62,7 @@ export function GoesOutComesInUnderline({
       {label}
       <div
         className={cn(
-          "absolute bottom-0 h-[2px] w-full bg-[#FFDA00] transition-transform duration-300 group-hover:",
+          "absolute bottom-0 h-[2px] w-full bg-[#15397F] transition-transform duration-300 group-hover:",
           direction === "left"
             ? "translate-x-0 group-hover:translate-x-full"
             : "translate-x-0 group-hover:-translate-x-full"
