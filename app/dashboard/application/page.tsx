@@ -113,6 +113,7 @@ export default function ApplicationForm() {
       ethnicity: [],
       is_student: false,
       school: '',
+      school_email: '',
       study_level: '',
       graduation_year: null,
       major: '',
@@ -168,6 +169,9 @@ export default function ApplicationForm() {
 
         if (!user) throw new Error("User not found")
 
+        // Pre-fill the email field with the user's email
+        form.setValue('email', user.email || '')
+
         const { data: application, error: applicationError } = await supabase
           .from("applications")
           .select("*")
@@ -181,6 +185,8 @@ export default function ApplicationForm() {
         if (application) {
           setExistingApplication(application)
           form.reset(application)
+          // Make sure email stays filled even when loading existing application
+          form.setValue('email', user.email || '')
         }
       } catch (error) {
         toast({
@@ -387,6 +393,30 @@ export default function ApplicationForm() {
                             className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]"
                           />
                         </FormControl>
+                        <FormMessage className="text-[#FFDA00]" />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-white">Email *</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="email"
+                            placeholder="Enter your email" 
+                            {...field} 
+                            required
+                            disabled
+                            className="bg-zinc-900/50 border-[#005CB9] text-white/70 cursor-not-allowed"
+                          />
+                        </FormControl>
+                        <FormDescription className="text-gray-400">
+                          This is the email associated with your account
+                        </FormDescription>
                         <FormMessage className="text-[#FFDA00]" />
                       </FormItem>
                     )}
@@ -606,7 +636,7 @@ export default function ApplicationForm() {
                             <FormLabel>School Email</FormLabel>
                             <FormControl>
                               <Input 
-                                type="email"
+                                type="school_email"
                                 placeholder="Enter your school email" 
                                 {...field} 
                                 value={field.value || ''} 
