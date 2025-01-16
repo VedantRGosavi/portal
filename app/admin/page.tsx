@@ -365,9 +365,9 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-6 bg-[#F5F7F9]">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h1 className="text-xl md:text-2xl font-bold text-[#15397F]">
+        <h1 className="text-xl md:text-2xl font-bold text-[#15397F] font-franklin">
           Application Review Dashboard
         </h1>
         <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
@@ -380,7 +380,7 @@ export default function AdminDashboard() {
               link.click()
               URL.revokeObjectURL(link.href)
             }}
-            className="w-full sm:w-auto border-[#15397F] text-[#FFDA00] hover:bg-[#15397F] hover:text-[#FFDA00]"
+            className="w-full sm:w-auto bg-[#15397F] text-white hover:bg-[#15397F]/90 hover:text-white font-franklin"
           >
             <Download className="w-4 h-4 mr-2" />
             Export Data
@@ -405,11 +405,11 @@ export default function AdminDashboard() {
             placeholder="Search applicants..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="bg-background border-[#15397F] text-foreground"
+            className="bg-white border-[#15397F] text-[#15397F] placeholder:text-[#15397F]/50 font-franklin"
           />
         </div>
         <Select defaultValue="all">
-          <SelectTrigger className="w-full sm:w-[180px] border-[#15397F] text-foreground">
+          <SelectTrigger className="w-full sm:w-[180px] border-[#15397F] text-[#15397F] font-franklin">
             <SelectValue placeholder="All Statuses" />
           </SelectTrigger>
           <SelectContent>
@@ -421,11 +421,11 @@ export default function AdminDashboard() {
         </Select>
       </div>
 
-      <div className="border border-[#15397F] rounded-lg overflow-x-auto">
+      <div className="border border-[#15397F] rounded-lg overflow-x-auto bg-white shadow-sm">
         <Table>
           <TableHeader>
             <TableRow className="border-b border-[#15397F] hover:bg-[#15397F]/5">
-              <TableHead className="text-[#FFDA00]">
+              <TableHead className="text-[#15397F] font-franklin">
                 <input
                   type="checkbox"
                   checked={selectedApplications.length > 0 && selectedApplications.length === paginatedApplications.length}
@@ -439,16 +439,16 @@ export default function AdminDashboard() {
                   className="rounded border-[#15397F]"
                 />
               </TableHead>
-              <TableHead className="text-[#FFDA00]">APPLICANT</TableHead>
-              <TableHead className="text-[#FFDA00] hidden md:table-cell">EMAIL</TableHead>
-              <TableHead className="text-[#FFDA00]">STATUS</TableHead>
-              <TableHead className="text-[#FFDA00] hidden sm:table-cell">SUBMITTED</TableHead>
-              <TableHead className="text-[#FFDA00]">ACTIONS</TableHead>
+              <TableHead className="text-[#15397F] font-franklin">APPLICANT</TableHead>
+              <TableHead className="text-[#15397F] hidden md:table-cell font-franklin">EMAIL</TableHead>
+              <TableHead className="text-[#15397F] font-franklin">STATUS</TableHead>
+              <TableHead className="text-[#15397F] hidden sm:table-cell font-franklin">SUBMITTED</TableHead>
+              <TableHead className="text-[#15397F] font-franklin">ACTIONS</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedApplications.map((application) => (
-              <TableRow key={application.id} className="border-b border-[#15397F] hover:bg-[#15397F]/5">
+              <TableRow key={application.id} className="border-b border-[#15397F]/20 hover:bg-[#15397F]/5">
                 <TableCell>
                   <input
                     type="checkbox"
@@ -466,22 +466,29 @@ export default function AdminDashboard() {
                 <TableCell className="font-medium">
                   <div className="flex items-center gap-2">
                     <Avatar className="w-8 h-8 border border-[#15397F]">
-                      <AvatarFallback className="bg-[#15397F] text-[#FFDA00] text-xs">
+                      <AvatarFallback className="bg-[#15397F] text-white text-xs font-franklin">
                         {application.name.split(' ').map(n => n[0]).join('')}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-foreground">{application.name}</span>
+                    <span className="text-[#15397F] font-franklin">{application.name}</span>
                   </div>
                 </TableCell>
-                <TableCell className="hidden md:table-cell text-foreground">{application.email}</TableCell>
+                <TableCell className="hidden md:table-cell text-[#15397F] font-franklin">{application.email}</TableCell>
                 <TableCell>
-                  <span className="px-2 py-1 text-xs rounded-full bg-[#FFDA00]/10 text-[#FFDA00]">
+                  <span className={`px-2 py-1 text-xs rounded-full font-franklin ${
+                    application.status === 'Accepted' ? 'bg-green-100 text-green-800' :
+                    application.status === 'Rejected' ? 'bg-red-100 text-red-800' :
+                    'bg-yellow-100 text-yellow-800'
+                  }`}>
                     {application.status}
                   </span>
                 </TableCell>
-                <TableCell className="hidden sm:table-cell text-foreground">{application.submitted}</TableCell>
+                <TableCell className="hidden sm:table-cell text-[#15397F] font-franklin">{application.submitted}</TableCell>
                 <TableCell>
-                  <Button variant="link" className="text-[#15397F] hover:text-[#FFDA00] p-0">
+                  <Button 
+                    variant="link" 
+                    className="text-[#15397F] hover:text-[#15397F]/80 p-0 font-franklin underline-offset-4"
+                  >
                     Review
                   </Button>
                 </TableCell>

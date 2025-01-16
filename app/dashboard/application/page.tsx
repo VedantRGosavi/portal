@@ -103,7 +103,9 @@ export default function ApplicationForm() {
     defaultValues: {
       first_name: '',
       last_name: '',
+      email: '',
       phone_number: '',
+      age: undefined,
       address: '',
       citizenship: '',
       technical_skills: [],
@@ -357,12 +359,12 @@ export default function ApplicationForm() {
                     name="first_name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-white">First Name</FormLabel>
+                        <FormLabel className="text-white">First Name *</FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="Enter your first name" 
                             {...field} 
-                            value={field.value || ''} 
+                            required
                             className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]"
                           />
                         </FormControl>
@@ -376,12 +378,12 @@ export default function ApplicationForm() {
                     name="last_name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-white">Last Name</FormLabel>
+                        <FormLabel className="text-white">Last Name *</FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="Enter your last name" 
                             {...field} 
-                            value={field.value || ''} 
+                            required
                             className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]"
                           />
                         </FormControl>
@@ -395,12 +397,12 @@ export default function ApplicationForm() {
                     name="phone_number"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-white">Phone Number</FormLabel>
+                        <FormLabel className="text-white">Phone Number *</FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="Enter your phone number" 
                             {...field} 
-                            value={field.value || ''} 
+                            required
                             className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]"
                           />
                         </FormControl>
@@ -428,11 +430,11 @@ export default function ApplicationForm() {
                     name="citizenship"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Residency</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value || ''}>
+                        <FormLabel>Country of Residence *</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value || ''} required>
                           <FormControl>
                             <SelectTrigger className="bg-zinc-900 border-[#005CB9] text-white">
-                              <SelectValue placeholder="Select your residency" />
+                              <SelectValue placeholder="Select your country of residence" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent className="bg-black border-[#005CB9] relative">
@@ -507,7 +509,7 @@ export default function ApplicationForm() {
                         name="school"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>School</FormLabel>
+                            <FormLabel>School *</FormLabel>
                             <VirtualizedSelect
                               value={field.value || ''}
                               onValueChange={field.onChange}
@@ -516,6 +518,9 @@ export default function ApplicationForm() {
                               options={filteredSchools}
                               placeholder="Select your school"
                             />
+                            <FormDescription className="text-gray-400">
+                              This field is required
+                            </FormDescription>
                             <FormMessage className="text-[#FFDA00]" />
                           </FormItem>
                         )}
@@ -526,8 +531,8 @@ export default function ApplicationForm() {
                         name="study_level"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Study Level</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value || ''}>
+                            <FormLabel>Level of Study *</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value || ''} required>
                               <FormControl>
                                 <SelectTrigger className="bg-zinc-900 border-[#005CB9] text-white">
                                   <SelectValue placeholder="Select your study level" />
@@ -1079,14 +1084,16 @@ export default function ApplicationForm() {
                         <FormControl>
                           <Checkbox
                             checked={field.value}
-                            onCheckedChange={field.onChange}
+                            onCheckedChange={(checked) => {
+                              field.onChange(checked === true);
+                            }}
                             required
                             className="border-[#005CB9] data-[state=checked]:bg-[#005CB9] data-[state=checked]:text-[#FFDA00]"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
                           <FormLabel>
-                            I have read and agree to the <a href="https://github.com/MLH/mlh-policies/blob/main/code-of-conduct.md" target="_blank" rel="noopener noreferrer" className="text-[#005CB9] hover:text-[#FFDA00] underline">MLH Code of Conduct</a>
+                            * I have read and agree to the <a href="https://github.com/MLH/mlh-policies/blob/main/code-of-conduct.md" target="_blank" rel="noopener noreferrer" className="text-[#005CB9] hover:text-[#FFDA00] underline">MLH Code of Conduct</a>
                           </FormLabel>
                         </div>
                       </FormItem>
@@ -1101,14 +1108,16 @@ export default function ApplicationForm() {
                         <FormControl>
                           <Checkbox
                             checked={field.value}
-                            onCheckedChange={field.onChange}
+                            onCheckedChange={(checked) => {
+                              field.onChange(checked === true);
+                            }}
                             required
                             className="border-[#005CB9] data-[state=checked]:bg-[#005CB9] data-[state=checked]:text-[#FFDA00]"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
                           <FormLabel>
-                            I authorize you to share my application/registration information with Major League Hacking for event administration, ranking, and MLH administration in-line with the <a href="https://github.com/MLH/mlh-policies/blob/main/privacy-policy.md" target="_blank" rel="noopener noreferrer" className="text-[#005CB9] hover:text-[#FFDA00] underline">MLH Privacy Policy</a>. I further agree to the terms of both the <a href="https://github.com/MLH/mlh-policies/blob/main/contest-terms.md" target="_blank" rel="noopener noreferrer" className="text-[#005CB9] hover:text-[#FFDA00] underline">MLH Contest Terms and Conditions</a> and the <a href="https://github.com/MLH/mlh-policies/blob/main/privacy-policy.md" target="_blank" rel="noopener noreferrer" className="text-[#005CB9] hover:text-[#FFDA00] underline">MLH Privacy Policy</a>
+                            * I authorize you to share my application/registration information with Major League Hacking for event administration, ranking, and MLH administration in-line with the <a href="https://github.com/MLH/mlh-policies/blob/main/privacy-policy.md" target="_blank" rel="noopener noreferrer" className="text-[#005CB9] hover:text-[#FFDA00] underline">MLH Privacy Policy</a>. I further agree to the terms of both the <a href="https://github.com/MLH/mlh-policies/blob/main/contest-terms.md" target="_blank" rel="noopener noreferrer" className="text-[#005CB9] hover:text-[#FFDA00] underline">MLH Contest Terms and Conditions</a> and the <a href="https://github.com/MLH/mlh-policies/blob/main/privacy-policy.md" target="_blank" rel="noopener noreferrer" className="text-[#005CB9] hover:text-[#FFDA00] underline">MLH Privacy Policy</a>
                           </FormLabel>
                         </div>
                       </FormItem>

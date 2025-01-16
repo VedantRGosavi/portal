@@ -8,23 +8,23 @@ export const applicationFormSchema = z.object({
   status: z.enum(["Draft", "Under Review", "Accepted", "Rejected"]).optional(),
   updated_at: z.string().optional(),
   
-  // Basic Info
-  phone_number: z.string().nullable().refine((val) => {
-    if (!val) return true;
-    return phoneRegex.test(val);
-  }, "Invalid phone number format"),
+  // Basic Info - Making required fields non-nullable
+  first_name: z.string().min(1, "First name is required"),
+  last_name: z.string().min(1, "Last name is required"),
+  email: z.string().email("Valid email is required"),
+  phone_number: z.string().refine((val) => phoneRegex.test(val), "Valid phone number is required"),
+  age: z.number().min(13, "You must be at least 13 years old").max(120, "Please enter a valid age"),
   address: z.string().nullable(),
-  citizenship: z.string().nullable(),
-  first_name: z.string().nullable(), // Added first_name field
-  last_name: z.string().nullable(), // Added last_name field  
+  citizenship: z.string().min(1, "Country of residence is required"),
   
-  // Education
+  // Education - Making required fields non-nullable
   is_student: z.boolean(),
-  school: z.string().nullable(),
-  study_level: z.string().nullable(),
+  school: z.string().min(1, "School name is required"),
+  study_level: z.string().min(1, "Level of study is required"),
   graduation_year: z.coerce.number().nullable(),
   major: z.string().nullable(),
   school_email: z.string().email().nullable(),
+  
   // Experience
   attended_mlh: z.boolean(),
   technical_skills: z.array(z.string()),
@@ -60,8 +60,12 @@ export const applicationFormSchema = z.object({
   underrepresented: z.boolean(),
   
   // Agreements
-  mlh_code_of_conduct: z.boolean(),
-  mlh_data_sharing: z.boolean(),
+  mlh_code_of_conduct: z.boolean().refine((val) => val === true, {
+    message: "You must agree to the MLH Code of Conduct"
+  }),
+  mlh_data_sharing: z.boolean().refine((val) => val === true, {
+    message: "You must agree to the MLH data sharing terms"
+  }),
   mlh_communications: z.boolean(),
   info_accurate: z.boolean(),
   understands_admission: z.boolean(),

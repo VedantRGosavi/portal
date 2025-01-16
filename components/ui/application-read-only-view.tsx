@@ -58,23 +58,31 @@ export function ApplicationReadOnlyView({ application }: ApplicationReadOnlyView
         <h2 className="text-xl font-semibold text-[#FFDA00] mb-6">Basic Information</h2>
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2">
-            <h3 className="font-medium text-white">First Name</h3>
+            <h3 className="font-medium text-white">First Name *</h3>
             <p className="text-muted-foreground">{application.first_name || 'Not provided'}</p>
           </div>
           <div className="space-y-2">
-            <h3 className="font-medium text-white">Last Name</h3>
+            <h3 className="font-medium text-white">Last Name *</h3>
             <p className="text-muted-foreground">{application.last_name || 'Not provided'}</p>
           </div>
           <div className="space-y-2">
-            <h3 className="font-medium text-white">Phone Number</h3>
+            <h3 className="font-medium text-white">Email *</h3>
+            <p className="text-muted-foreground">{application.email || 'Not provided'}</p>
+          </div>
+          <div className="space-y-2">
+            <h3 className="font-medium text-white">Phone Number *</h3>
             <p className="text-muted-foreground">{application.phone_number || 'Not provided'}</p>
+          </div>
+          <div className="space-y-2">
+            <h3 className="font-medium text-white">Age *</h3>
+            <p className="text-muted-foreground">{application.age || 'Not provided'}</p>
           </div>
           <div className="space-y-2">
             <h3 className="font-medium text-white">Address</h3>
             <p className="text-muted-foreground">{application.address || 'Not provided'}</p>
           </div>
           <div className="space-y-2">
-            <h3 className="font-medium text-white">Residency</h3>
+            <h3 className="font-medium text-white">Country of Residence *</h3>
             <p className="text-muted-foreground">{application.citizenship || 'Not provided'}</p>
           </div>
         </div>
@@ -89,11 +97,11 @@ export function ApplicationReadOnlyView({ application }: ApplicationReadOnlyView
             <p className="text-muted-foreground">{application.is_student ? 'Current Student' : 'Not a Student'}</p>
           </div>
           <div className="space-y-2">
-            <h3 className="font-medium text-white">School</h3>
+            <h3 className="font-medium text-white">School *</h3>
             <p className="text-muted-foreground">{application.school || 'Not provided'}</p>
           </div>
           <div className="space-y-2">
-            <h3 className="font-medium text-white">Study Level</h3>
+            <h3 className="font-medium text-white">Level of Study *</h3>
             <p className="text-muted-foreground">{application.study_level || 'Not provided'}</p>
           </div>
           <div className="space-y-2">
@@ -237,6 +245,25 @@ export function ApplicationReadOnlyView({ application }: ApplicationReadOnlyView
           <div className="space-y-2">
             <h3 className="font-medium text-white">Underrepresented Group</h3>
             <p className="text-muted-foreground">{application.underrepresented ? 'Yes' : 'No'}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Agreements Section */}
+      <div className="bg-black/30 rounded-lg p-6 border border-[#005CB9]/20">
+        <h2 className="text-xl font-semibold text-[#FFDA00] mb-6">Agreements</h2>
+        <div className="grid gap-6">
+          <div className="space-y-2">
+            <h3 className="font-medium text-white">MLH Code of Conduct *</h3>
+            <p className="text-muted-foreground">{application.mlh_code_of_conduct ? 'Agreed' : 'Not agreed'}</p>
+          </div>
+          <div className="space-y-2">
+            <h3 className="font-medium text-white">MLH Data Sharing *</h3>
+            <p className="text-muted-foreground">{application.mlh_data_sharing ? 'Agreed' : 'Not agreed'}</p>
+          </div>
+          <div className="space-y-2">
+            <h3 className="font-medium text-white">MLH Communications</h3>
+            <p className="text-muted-foreground">{application.mlh_communications ? 'Opted in' : 'Opted out'}</p>
           </div>
         </div>
       </div>

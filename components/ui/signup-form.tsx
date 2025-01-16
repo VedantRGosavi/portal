@@ -64,11 +64,11 @@ export function SignupForm({
   }
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={cn("flex flex-col gap-4", className)} {...props}>
       <Card className="overflow-hidden bg-black/50 backdrop-blur-sm border-[#005CB9]/30">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form onSubmit={handleFormSubmit} className="p-6 md:p-8 text-white">
-            <div className="flex flex-col gap-6">
+          <form onSubmit={handleFormSubmit} className="p-4 sm:p-6 text-white">
+            <div className="flex flex-col gap-4">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold text-white">Create an account</h1>
                 <p className="text-balance text-gray-400">
@@ -80,7 +80,7 @@ export function SignupForm({
                 <div className="text-red-500 text-sm text-center">{error}</div>
               )}
 
-              <div className="grid gap-2">
+              <div className="grid gap-1.5">
                 <Label htmlFor="email" className="text-white">Email</Label>
                 <Input
                   id="email"
@@ -91,12 +91,12 @@ export function SignupForm({
                   required
                   className="bg-zinc-900 border-zinc-800 text-white"
                 />
-                <p className="text-sm text-yellow-500">
+                <p className="text-xs text-yellow-500">
                   Please use a non-edu email. We apologize for this inconvenience.
                 </p>
               </div>
 
-              <div className="grid gap-2">
+              <div className="grid gap-1.5">
                 <Label htmlFor="password" className="text-white">Password</Label>
                 <Input 
                   id="password" 
@@ -108,7 +108,7 @@ export function SignupForm({
                 />
               </div>
 
-              <div className="grid gap-2">
+              <div className="grid gap-1.5">
                 <Label htmlFor="confirm-password" className="text-white">Confirm Password</Label>
                 <Input 
                   id="confirm-password" 
@@ -119,7 +119,7 @@ export function SignupForm({
                   className="bg-zinc-900 border-zinc-800 text-white"
                 />
                 {passwordError && (
-                  <span className="text-red-500 text-sm">{passwordError}</span>
+                  <span className="text-red-500 text-xs">{passwordError}</span>
                 )}
               </div>
 
