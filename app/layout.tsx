@@ -1,12 +1,9 @@
 // app/layout.tsx
 
-import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "next-themes"
 import { TubelightNavbar } from "@/components/ui/tubelight-navbar"
 import { Toaster } from "@/components/ui/toaster"
-
-const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
   title: "RocketHacks",
@@ -20,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className="font-franklinGothic"> 
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
