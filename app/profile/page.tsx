@@ -27,7 +27,7 @@ import { VirtualizedSelect } from "@/components/ui/virtualized-select"
 const profileSchema = z.object({
   display_name: z.string().min(1, "Display name is required").max(50, "Display name must be less than 50 characters"),
   email: z.string().email("Invalid email address").min(1, "Email is required"),
-  age: z.string().refine((val) => !val || (parseInt(val) >= 13 && parseInt(val) <= 120), {
+  age: z.string().min(1, "Age is required").refine((val) => parseInt(val) >= 13 && parseInt(val) <= 120, {
     message: "Age must be between 13 and 120",
   }),
   school: z.string().min(1, "School is required"),
@@ -75,14 +75,13 @@ export default function ProfileSettings() {
           throw error
         }
         
-        // Ensure we're setting the school value correctly
         const formValues = {
           display_name: data?.display_name || '',
           email: data?.email || user.email || '',
           age: data?.age?.toString() || '',
           school: data?.school || ''
         }
-        
+
         // Set the initial school search to match the saved school
         if (data?.school) {
           setSchoolSearch(data.school)
@@ -105,6 +104,14 @@ export default function ProfileSettings() {
       }
     }
   })
+
+  // Add effect to sync school value with search
+  useEffect(() => {
+    const schoolValue = form.watch('school')
+    if (schoolValue && schoolValue !== schoolSearch) {
+      setSchoolSearch(schoolValue)
+    }
+  }, [form.watch('school')])
 
   const handleSaveChanges = async (values: z.infer<typeof profileSchema>) => {
     if (loading) return;
@@ -226,7 +233,7 @@ export default function ProfileSettings() {
                 name="age"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Age</FormLabel>
+                    <FormLabel>Age *</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
