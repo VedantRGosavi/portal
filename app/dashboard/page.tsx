@@ -52,7 +52,7 @@ export default function Dashboard() {
             <ul className="space-y-2">
               <li className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Application Deadline</span>
-                <span className="text-sm font-medium text-[#FFDA00]">February 15, 2025</span>
+                <span className="text-sm font-medium text-red-500">February 15, 2025</span>
               </li>
               <li className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Team Formation</span>
@@ -108,8 +108,12 @@ export default function Dashboard() {
               <p className="text-sm text-muted-foreground">Stay tuned for the announcement of our inspiring keynote speaker.</p>
             </li>
             <li>
-              <p className="font-medium text-[#FFDA00]">New Workshop Added: Intro to AI</p>
-              <p className="text-sm text-muted-foreground">Learn the basics of AI and machine learning in our new workshop.</p>
+              <p className="font-medium text-[#FFDA00]">New Workshop Added: Intro to Github using Perplexity AI</p>
+              <p className="text-sm text-muted-foreground">Learn the basics of Github and troubleshooting Github issues using Perplexity AI in our new workshop.</p>
+            </li>
+            <li>
+              <p className="font-medium text-[#FFDA00]">AWS and Perplexity AI Sponsor RocketHacks</p>
+              <p className="text-sm text-muted-foreground">AWS and Perplexity AI are sponsoring RocketHacks this year! We are so excited to have them onboard.</p>
             </li>
             <li>
               <p className="font-medium"><span className="text-red-500">Reminder:</span> <span className="text-[#FFDA00]">Registration Closes Soon</span></p>
