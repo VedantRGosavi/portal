@@ -93,10 +93,6 @@ export function ApplicationReadOnlyView({ application }: ApplicationReadOnlyView
         <h2 className="text-xl font-semibold text-[#FFDA00] mb-6">Education</h2>
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2">
-            <h3 className="font-medium text-white">Student Status</h3>
-            <p className="text-muted-foreground">{application.is_student ? 'Current Student' : 'Not a Student'}</p>
-          </div>
-          <div className="space-y-2">
             <h3 className="font-medium text-white">School *</h3>
             <p className="text-muted-foreground">{application.school || 'Not provided'}</p>
           </div>

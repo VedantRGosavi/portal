@@ -111,7 +111,6 @@ export default function ApplicationForm() {
       technical_skills: [],
       programming_languages: [],
       ethnicity: [],
-      is_student: false,
       school: '',
       school_email: '',
       study_level: '',
@@ -512,146 +511,123 @@ export default function ApplicationForm() {
               {/* Education Section */}
               <div className="space-y-6">
                 <h2 className="text-xl font-semibold text-[#FFDA00]">Education</h2>
-                <div className="grid gap-4">
+                <div className="grid gap-4 md:grid-cols-2">
                   <FormField
                     control={form.control}
-                    name="is_student"
+                    name="school"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            className="border-[#005CB9] data-[state=checked]:bg-[#005CB9] data-[state=checked]:text-[#FFDA00]"
-                          />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel>Are you currently a student?</FormLabel>
-                        </div>
+                      <FormItem>
+                        <FormLabel>School *</FormLabel>
+                        <VirtualizedSelect
+                          value={field.value || ''}
+                          onValueChange={field.onChange}
+                          searchValue={schoolSearch}
+                          onSearchChange={setSchoolSearch}
+                          options={filteredSchools}
+                          placeholder="Select your school"
+                        />
+                        <FormDescription className="text-gray-400">
+                          This field is required
+                        </FormDescription>
+                        <FormMessage className="text-[#FFDA00]" />
                       </FormItem>
                     )}
                   />
 
-                  {form.watch("is_student") && (
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <FormField
-                        control={form.control}
-                        name="school"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>School *</FormLabel>
-                            <VirtualizedSelect
-                              value={field.value || ''}
-                              onValueChange={field.onChange}
-                              searchValue={schoolSearch}
-                              onSearchChange={setSchoolSearch}
-                              options={filteredSchools}
-                              placeholder="Select your school"
-                            />
-                            <FormDescription className="text-gray-400">
-                              This field is required
-                            </FormDescription>
-                            <FormMessage className="text-[#FFDA00]" />
-                          </FormItem>
-                        )}
-                      />
+                  <FormField
+                    control={form.control}
+                    name="study_level"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Level of Study *</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value || ''} required>
+                          <FormControl>
+                            <SelectTrigger className="bg-zinc-900 border-[#005CB9] text-white">
+                              <SelectValue placeholder="Select your study level" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-black border-[#005CB9]">
+                            {STUDY_LEVELS.map((level) => (
+                              <SelectItem 
+                                key={level} 
+                                value={level}
+                                className="text-white hover:bg-[#005CB9] hover:text-[#FFDA00]"
+                              >
+                                {level}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="text-[#FFDA00]" />
+                      </FormItem>
+                    )}
+                  />
 
-                      <FormField
-                        control={form.control}
-                        name="study_level"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Level of Study *</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value || ''} required>
-                              <FormControl>
-                                <SelectTrigger className="bg-zinc-900 border-[#005CB9] text-white">
-                                  <SelectValue placeholder="Select your study level" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent className="bg-black border-[#005CB9]">
-                                {STUDY_LEVELS.map((level) => (
-                                  <SelectItem 
-                                    key={level} 
-                                    value={level}
-                                    className="text-white hover:bg-[#005CB9] hover:text-[#FFDA00]"
-                                  >
-                                    {level}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage className="text-[#FFDA00]" />
-                          </FormItem>
-                        )}
-                      />
+                  <FormField
+                    control={form.control}
+                    name="graduation_year"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Expected Graduation Year</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value?.toString() || ''}>
+                          <FormControl>
+                            <SelectTrigger className="bg-zinc-900 border-[#005CB9] text-white">
+                              <SelectValue placeholder="Select graduation year" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-black border-[#005CB9]">
+                            {graduationYears.map((year) => (
+                              <SelectItem 
+                                key={year} 
+                                value={year.toString()}
+                                className="text-white hover:bg-[#005CB9] hover:text-[#FFDA00]"
+                              >
+                                {year}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="text-[#FFDA00]" />
+                      </FormItem>
+                    )}
+                  />
 
-                      <FormField
-                        control={form.control}
-                        name="graduation_year"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Expected Graduation Year</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value?.toString() || ''}>
-                              <FormControl>
-                                <SelectTrigger className="bg-zinc-900 border-[#005CB9] text-white">
-                                  <SelectValue placeholder="Select graduation year" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent className="bg-black border-[#005CB9]">
-                                {graduationYears.map((year) => (
-                                  <SelectItem 
-                                    key={year} 
-                                    value={year.toString()}
-                                    className="text-white hover:bg-[#005CB9] hover:text-[#FFDA00]"
-                                  >
-                                    {year}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage className="text-[#FFDA00]" />
-                          </FormItem>
-                        )}
-                      />
+                  <FormField
+                    control={form.control}
+                    name="major"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Major/Field of Study</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter your major" {...field} value={field.value || ''} className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]" />
+                        </FormControl>
+                        <FormMessage className="text-[#FFDA00]" />
+                      </FormItem>
+                    )}
+                  />
 
-                      <FormField
-                        control={form.control}
-                        name="major"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Major/Field of Study</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Enter your major" {...field} value={field.value || ''} className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]" />
-                            </FormControl>
-                            <FormMessage className="text-[#FFDA00]" />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="school_email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>School Email</FormLabel>
-                            <FormControl>
-                              <Input 
-                                type="school_email"
-                                placeholder="Enter your school email" 
-                                {...field} 
-                                value={field.value || ''} 
-                                className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]" 
-                              />
-                            </FormControl>
-                            <FormDescription className="text-gray-400">
-                              Please use your official school email address
-                            </FormDescription>
-                            <FormMessage className="text-[#FFDA00]" />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  )}
+                  <FormField
+                    control={form.control}
+                    name="school_email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>School Email</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="school_email"
+                            placeholder="Enter your school email" 
+                            {...field} 
+                            value={field.value || ''} 
+                            className="bg-zinc-900 border-[#005CB9] text-white focus:ring-[#FFDA00] focus:border-[#FFDA00]" 
+                          />
+                        </FormControl>
+                        <FormDescription className="text-gray-400">
+                          Please use your official school email address
+                        </FormDescription>
+                        <FormMessage className="text-[#FFDA00]" />
+                      </FormItem>
+                    )}
+                  />
                 </div>
               </div>
 

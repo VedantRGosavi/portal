@@ -1,5 +1,6 @@
 // app/profile/page.tsx
 
+
 'use client'
 import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
@@ -52,17 +53,20 @@ export default function ProfileSettings() {
 
   const form = useForm({
     resolver: zodResolver(profileSchema),
-    defaultValues: async () => {
+    defaultValues: {
+      display_name: '',
+      email: '',
+      age: '',
+      school: ''
+    }
+  })
+
+  // Load initial profile data
+  useEffect(() => {
+    async function loadProfile() {
       try {
         const { data: { user } } = await supabase.auth.getUser()
-        if (!user) {
-          return {
-            display_name: '',
-            email: '',
-            age: '',
-            school: ''
-          }
-        }
+        if (!user) return
 
         const { data, error } = await supabase
           .from('profile')
@@ -74,20 +78,19 @@ export default function ProfileSettings() {
           console.error('Error fetching profile:', error)
           throw error
         }
-        
-        const formValues = {
+
+        // Set form values
+        form.reset({
           display_name: data?.display_name || '',
           email: data?.email || user.email || '',
           age: data?.age?.toString() || '',
           school: data?.school || ''
-        }
+        })
 
-        // Set the initial school search to match the saved school
-        if (data?.school) {
-          setSchoolSearch(data.school)
+        // Only update search if there's no current search value
+        if (data?.school && !schoolSearch) {
+          setSchoolSearch('')
         }
-
-        return formValues
       } catch (error) {
         console.error('Error fetching initial profile data:', error)
         toast({
@@ -95,23 +98,19 @@ export default function ProfileSettings() {
           description: "Failed to load profile data. Please refresh the page.",
           variant: "destructive",
         })
-        return {
-          display_name: '',
-          email: '',
-          age: '',
-          school: ''
-        }
       }
     }
-  })
 
-  // Add effect to sync school value with search
+    loadProfile()
+  }, [])
+
+  // Add cleanup for async operations
   useEffect(() => {
-    const schoolValue = form.watch('school')
-    if (schoolValue && schoolValue !== schoolSearch) {
-      setSchoolSearch(schoolValue)
+    const abortController = new AbortController()
+    return () => {
+      abortController.abort()
     }
-  }, [form.watch('school')])
+  }, [])
 
   const handleSaveChanges = async (values: z.infer<typeof profileSchema>) => {
     if (loading) return;
@@ -163,14 +162,6 @@ export default function ProfileSettings() {
       setLoading(false)
     }
   }
-
-  // Add cleanup for async operations
-  useEffect(() => {
-    const abortController = new AbortController()
-    return () => {
-      abortController.abort()
-    }
-  }, [])
 
   return (
     <div className="container mx-auto p-4 sm:p-6 md:p-8">

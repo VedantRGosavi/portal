@@ -18,7 +18,6 @@ export const applicationFormSchema = z.object({
   citizenship: z.string().min(1, "Country of residence is required"),
   
   // Education - Making required fields non-nullable
-  is_student: z.boolean(),
   school: z.string().min(1, "School name is required"),
   study_level: z.string().min(1, "Level of study is required"),
   graduation_year: z.coerce.number().nullable(),

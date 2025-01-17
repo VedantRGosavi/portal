@@ -57,7 +57,6 @@ create table
     phone_number text null,
     address text null,
     citizenship text null,
-    is_student boolean null,
     study_level text null,
     graduation_year integer null,
     major text null,
